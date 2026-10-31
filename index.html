@@ -77,7 +77,7 @@ const taunts=["Your confidence is statistically concerning.","My lawyer approved
 const defaults={wins:0,losses:0,draws:0,sound:false,mode:"fair",difficulty:"hard"};
 let settings={...defaults};
 try{const value=JSON.parse(localStorage.getItem("tic-tac-hell-v2")||"{}");for(const k of Object.keys(defaults))if(typeof value[k]===typeof defaults[k])settings[k]=value[k];}catch{}
-let board=[],n=3,turns=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[],awardedLines=new Set(),previousMarks=new Map(),previousSize=3,previousScores={wins:settings.wins,losses:settings.losses,draws:settings.draws};
+let board=[],n=3,turns=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[],awardedLines=new Set(),tantrumCount=0,previousMarks=new Map(),previousSize=3,previousScores={wins:settings.wins,losses:settings.losses,draws:settings.draws};
 const save=()=>{try{localStorage.setItem("tic-tac-hell-v2",JSON.stringify(settings));}catch{}};
 const random=a=>a[Math.floor(Math.random()*a.length)];
 const empty=()=>board.flatMap((row,r)=>row.map((v,c)=>v?"":r*n+c)).filter(v=>v!=="");
@@ -88,7 +88,7 @@ function log(message){const p=document.createElement("p");p.textContent=message;
 function animateOnce(element,cls){if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;element.classList.remove(cls);void element.offsetWidth;element.classList.add(cls);element.addEventListener("animationend",()=>element.classList.remove(cls),{once:true});}
 function say(message){$("status").textContent=message;animateOnce($("status"),"status-pulse");log(message);}
 function updateScore(){["wins","losses","draws"].forEach(k=>{const old=previousScores[k];$(k).textContent=settings[k];if(old!==settings[k]){animateOnce($(k).closest(".stat"),"stat-ping");previousScores[k]=settings[k];}});save();}
-function reset(){session++;n=3;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];awardedLines.clear();previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Welcome to Tic Tac Hell. Winning is subject to judicial review.");draw();}
+function reset(){session++;n=3;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];awardedLines.clear();tantrumCount=0;document.querySelector(".tantrum-overlay")?.remove();previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Welcome to Tic Tac Hell. Winning is subject to judicial review.");draw();}
 function lines(k){const arr=[],d=[[1,0],[0,1],[1,1],[1,-1]];for(let r=0;r<n;r++)for(let c=0;c<n;c++)for(const [dr,dc] of d){const e=[];for(let j=0;j<k;j++){const y=r+j*dr,x=c+j*dc;if(y<0||x<0||y>=n||x>=n)break;e.push(y*n+x);}if(e.length===k)arr.push(e);}return arr;}
 function match(who,oneAway=false){for(const line of lines(Math.min(n,5))){const values=line.map(get);if(oneAway?values.filter(v=>v===who).length===line.length-1&&values.includes(""):values.every(v=>v===who))return line;}return null;}
 function draw(){const el=$("board");const grew=n!==previousSize;const nextMarks=new Map();if(grew)animateOnce(el,"board-impact");previousSize=n;el.replaceChildren();el.style.gridTemplateColumns="repeat("+n+",minmax(0,1fr))";el.style.gridTemplateRows="repeat("+n+",minmax(0,1fr))";el.classList.toggle("big",n>3);$("board-size").textContent=n+" × "+n+" BOARD";$("mode-label").textContent=settings.mode==="fair"?"FAIR PLAY":"CHAOS PROTOCOL ACTIVE";$("round-label").textContent=finished?"Round complete.":thinking?"The AI is plotting.":"Your move, troublemaker.";$("difficulty").disabled=settings.mode==="hell";const clueText="Evidence: "+evidence.length+" · Guilty verdicts: "+convictions+"/3 · Clues: "+clues+"/5 · Shield: "+protection;if($("clue-count").textContent!==clueText){$("clue-count").textContent=clueText;animateOnce($("clue-count"),"clue-ping");}for(let i=0;i<n*n;i++){const b=document.createElement("button"),v=get(i);b.type="button";const key=Math.floor(i/n)+":"+(i%n);b.className="cell"+(v?" "+v.toLowerCase():"")+(v&&previousMarks.get(key)!==v?" fresh":"")+(winning.includes(i)?" win":"");if(v)nextMarks.set(key,v);b.textContent=v;b.setAttribute("aria-label","Row "+(Math.floor(i/n)+1)+", column "+(i%n+1)+(v?", "+v:" empty"));b.disabled=finished||thinking||!!v;b.addEventListener("click",()=>move(i));el.append(b);}previousMarks=nextMarks;}
@@ -97,32 +97,57 @@ function evaluate3(cells){const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2
 function minimax(b,depth,isAI,alpha,beta){const v=evaluate3(b);if(v)return v==="O"?10-depth:v==="X"?depth-10:0;let best=isAI?-Infinity:Infinity;for(const i of [4,0,2,6,8,1,3,5,7]){if(b[i])continue;b[i]=isAI?"O":"X";let score=minimax(b,depth+1,!isAI,alpha,beta);b[i]="";best=isAI?Math.max(best,score):Math.min(best,score);if(isAI)alpha=Math.max(alpha,best);else beta=Math.min(beta,best);if(beta<=alpha)break;}return best;}
 function pickAI(){const available=empty();if(!available.length)return null;const flat=board.flat();let best=-Infinity,choices=[];for(const i of available){flat[i]="O";const score=minimax(flat,0,false,-Infinity,Infinity);flat[i]="";if(score>best){best=score;choices=[i];}else if(score===best)choices.push(i);}/* Every personality chooses only minimax-optimal moves. The AI cannot lose from an empty 3x3 board. */return random(choices);}
 function move(i){if(finished||thinking||get(i))return;set(i,"X");turns++;tone(520);if(settings.mode==="fair"){const w=match("X");if(w)return conclude("X",w);if(!empty().length)return conclude("draw");thinking=true;say("The AI is considering your questionable life choices.");draw();const stamp=session;setTimeout(()=>{if(stamp!==session)return;thinking=false;const p=pickAI();if(p!==null)set(p,"O");tone(310);const aw=match("O");if(aw)return conclude("O",aw);if(!empty().length)return conclude("draw");const lines={easy:["I am relaxed, not incompetent.","A friendly reminder: I cannot lose."],medium:["I saw that coming.","Nice try. I calculated all of that."],hard:taunts};say(random(lines[settings.difficulty]||taunts));draw();},220);return;}
-// The machine earns the player's trust first. Every human turn gets exactly one ordinary AI reply.
-const victory=match("X");
-let scored=false;
-if(victory){
- const signature=victory.join(",");
- if(!awardedLines.has(signature)){
-  awardedLines.add(signature);settings.wins++;updateScore();winning=victory.slice();
-  say("POINT TO THE HUMAN! The machine is reviewing your victory.");
-  tone(720);scored=true;draw();animateOnce($("board"),"board-impact");
-  setTimeout(()=>{if(settings.mode==="hell"&&!finished){winning=[];draw();}},720);
+// Always show the player's mark before the machine reacts. Timers are invalidated by reset().
+const stamp=session;
+thinking=true;draw();tone(530);
+setTimeout(()=>{
+ if(stamp!==session||settings.mode!=="hell")return;
+ const victory=match("X");
+ const fresh=victory&&!awardedLines.has(victory.join(","));
+ if(fresh){
+  awardedLines.add(victory.join(","));settings.wins++;updateScore();winning=victory.slice();draw();
+  say("THE HUMAN SCORED! THE MACHINE IS LOSING ITS MIND.");
+  tantrumCount++;
+  tantrumScene(tantrumCount,()=>{
+   if(stamp!==session||settings.mode!=="hell")return;
+   winning=[];hellAI();draw();
+   setTimeout(()=>{if(stamp!==session||settings.mode!=="hell")return;cheat(true,i);finishHellTurn();},380);
+  });
+  return;
  }
+ hellAI();draw();
+ setTimeout(()=>{
+  if(stamp!==session||settings.mode!=="hell")return;
+  const impending=!!match("X",true);
+  if(turns>4&&(turns===5||(turns-5)%2===0||impending))cheat(impending,i);
+  else say(turns<=4?"A normal move. For now.":random(taunts));
+  finishHellTurn();
+ },400);
+},340);
 }
-const impending=!!victory||!!match("X",true);
-hellAI();
-if(turns<=4){
-  if(!scored)say(turns===1?"Your opponent has entered its first move.":random(["A normal move. For now.","The machine is studying your strategy.","Your turn. Everything is functioning normally."]));
-}else if(impending||turns===5||((turns-5)%2===0)){
-  cheat(impending);
-}else{
-  say(random(taunts));
+function finishHellTurn(){
+ if(turns>=5&&turns%3===2&&clues<5){clues++;say("A sealed transcript surfaced. FILE "+clues+"/5.");}
+ if(convictions>=3&&clues>=5&&n===10&&!appealed){appealed=true;say("THE SUPREME COURT HAS LOST CONTROL. Final terminal command unlocked.");}
+ thinking=false;draw();
 }
-if(turns>=5&&turns%3===2&&clues<5){clues++;say("A sealed transcript surfaced. FILE "+clues+"/5.");}
-if(convictions>=3&&clues>=5&&n===10&&!appealed){appealed=true;say("THE SUPREME COURT HAS LOST CONTROL. Final terminal command unlocked.");}
-draw();}
+function tantrumScene(count,onDone){
+ const e=document.createElement("div");e.className="tantrum-overlay";e.setAttribute("role","status");
+ const phrases=["NO. NO. NO!","THAT DOESN'T COUNT!","I DEMAND A RECOUNT!","THE RULES ARE MINE!"];
+ const big=document.createElement("strong");big.textContent=phrases[(count-1)%phrases.length];
+ const small=document.createElement("span");small.textContent="THE MACHINE IS HAVING A FULL-SCALE TANTRUM";
+ e.append(big,small);document.body.append(e);tone(130);
+ const stamp=session;
+ setTimeout(()=>{e.remove();if(stamp===session)onDone();},window.matchMedia("(prefers-reduced-motion: reduce)").matches?500:1600);
+}
 function expand(){if(n>=10)return false;const old=board;n++;board=Array.from({length:n},(_,r)=>Array.from({length:n},(_,c)=>old[r]?.[c]||""));return true;}
-function erase(){const xs=[];for(let i=0;i<n*n;i++)if(get(i)==="X")xs.push(i);for(let k=0;k<Math.min(2,xs.length);k++){const pick=Math.floor(Math.random()*xs.length);set(xs.splice(pick,1)[0],"");}}
+function erase(preferred){const xs=[];for(let i=0;i<n*n;i++)if(get(i)==="X")xs.push(i);
+ const targets=[];if(Number.isInteger(preferred)&&get(preferred)==="X"){targets.push(preferred);xs.splice(xs.indexOf(preferred),1);}
+ while(targets.length<2&&xs.length){targets.push(xs.splice(Math.floor(Math.random()*xs.length),1)[0]);}
+ if(!targets.length)return;
+ const positions=targets.map(i=>[Math.floor(i/n),i%n]);
+ for(const i of targets){const cell=$("board").children[i];if(cell)cell.classList.add("erasing");}
+ const stamp=session;setTimeout(()=>{if(stamp!==session)return;for(const [r,c] of positions)if(board[r]?.[c]==="X")board[r][c]="";draw();say("THE MACHINE ERASED YOUR X. THAT WAS NOT A LEGAL MOVE.");},540);
+}
 function hellAI(){const open=empty();if(!open.length){if(n<10){expand();say("The board expanded. There is nowhere left to hide.");}else{erase();say("The machine erased two occupied squares.");}return;}
   // Block immediate wins first; otherwise add pressure around existing O marks.
   const threats=lines(Math.min(n,5)).filter(line=>line.filter(i=>get(i)==="X").length===line.length-1&&line.filter(i=>!get(i)).length===1);
@@ -131,7 +156,7 @@ function hellAI(){const open=empty();if(!open.length){if(n<10){expand();say("The
   pressure.sort((a,b)=>b.score-a.score);
   set(blockers.length?random(blockers):pressure[0].i,"O");
   if(match("O")){erase();say("I WON. The court has ordered your last two marks removed.");}}
-function cheat(emergency=false){
+function cheat(emergency=false,lastMove=null){
   cheats++;
   let type,description,action;
   // Growth is part of chapter progression, not a random possibility. Protection never blocks growth.
@@ -141,7 +166,7 @@ function cheat(emergency=false){
     action=()=>{expand();say("THE COURT HAS AMENDED THE BOARD: "+n+" by "+n+".");};
   }else if(emergency||cheats%3===0){
     type="erasure";description="The AI erased your placed X marks.";
-    action=()=>{erase();say("YOUR WINNING LINE HAS BEEN EXPUNGED.");};
+    action=()=>{erase(lastMove);say("THE MACHINE IS TRYING TO ERASE YOUR MOVE.");};
   }else{
     type="double";description="The AI took two turns in a row.";
     action=()=>{hellAI();hellAI();say("EXECUTIVE ORDER: TWO AI TURNS. NO APPEALS.");};
@@ -151,7 +176,7 @@ function cheat(emergency=false){
   else if(protection>0){protection--;say("INJUNCTION ENFORCED: attempted cheat #"+cheats+" blocked. Evidence preserved.");}
   else action();
   // Even a shield must never grant a normal victory in the intentionally rigged mode.
-  if(match("X")){if(n<10)expand();else erase();say("The machine is changing the rules, but your recorded point stands.");}
+  if(match("X")){if(n<10)expand();else erase(lastMove);say("The machine is changing the rules, but your recorded point stands.");}
   animateOnce($("board"),"board-impact");
   if(n===10&&turns%6===0)log("FICTIONAL OS ALERT: fairness.dll has left the chat.");
   tone(130);
