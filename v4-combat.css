@@ -1,0 +1,61 @@
+/* v4: board-first play space, compact tabs, cinematic court combat */
+.arcade-shell{padding:8px clamp(9px,1.2vw,19px)!important;gap:5px}
+.arcade-shell .marquee-line,.arcade-shell .footer{display:none!important}
+.arcade-header{min-height:41px!important}.arcade-header h1{font-size:clamp(1.4rem,2.1vw,2.25rem)!important}
+.arcade-header .brand-mark{width:32px;height:32px}
+.arcade-layout{grid-template-columns:minmax(0,7fr) minmax(275px,3fr)!important;gap:11px;margin-top:0!important;min-height:0}
+.arcade-arena{padding:clamp(10px,1.25vw,18px)!important}
+.arena-stage{background:radial-gradient(circle at 50% 50%,#3d173a44,#0e0b19 70%)!important;margin:8px 0!important;padding:8px!important;box-shadow:inset 0 0 55px #fa2e7120}
+.arcade-arena .board,.arcade-arena .board.big{width:min(100%,calc(100dvh - 198px),620px)!important;max-height:100%;height:auto;aspect-ratio:1}
+.arcade-arena .board.big{gap:clamp(2px,.28vw,4px)}
+.arena-head h2{font-size:clamp(.97rem,1.35vw,1.24rem)}
+.arcade-status{margin-top:7px;min-height:35px}
+.arcade-sidebar.tabbed-sidebar{display:flex;flex-direction:column;gap:0;height:100%;min-height:0;overflow:hidden;background:#14101d;border:1px solid #5b3856}
+.tabbed-sidebar .game-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));flex:0 0 auto;padding:8px;gap:5px;border-bottom:1px solid #5b3856;background:#201329}
+.tabbed-sidebar .game-tab{background:#2a1e33;border:1px solid transparent;color:#a79caf;padding:13px 5px;font:900 .66rem system-ui;letter-spacing:.095em;cursor:pointer;transition:color .2s,border-color .2s,background .2s}
+.tabbed-sidebar .game-tab:hover{border-color:#ff6c9a88;color:#fff}
+.tabbed-sidebar .game-tab.selected{background:#68223f;color:#ffdfad;border-color:#ff4c88;box-shadow:inset 0 -3px #ff5f86}
+.tabbed-sidebar .tab-panel{height:100%;min-height:0;overflow:auto;flex:1 1 auto;border:0;border-radius:0!important;padding:clamp(12px,1.5vw,22px)!important;background:transparent}
+.tabbed-sidebar .tab-panel[hidden]{display:none!important}
+.tabbed-sidebar .section-heading h2{font-size:clamp(1.25rem,1.5vw,1.55rem)}
+.tabbed-sidebar .settings .field{min-height:65px}
+.tabbed-sidebar .settings .stat{padding:17px 5px}
+.tabbed-sidebar .chronicle .story-actions{grid-template-columns:1fr}
+.tabbed-sidebar .chronicle .story-actions button{min-height:65px}
+.tabbed-sidebar .chronicle .story-actions button small{display:block!important}
+.tabbed-sidebar .transmission-panel .log{height:auto;flex:1;min-height:130px;max-height:none}
+.tabbed-sidebar .transmission-panel{display:flex;flex-direction:column}
+.arcade-arena .cell.fresh.x{animation:hellMark .33s cubic-bezier(.1,1.6,.3,1) both,playerSpark .45s ease}
+.arcade-arena .cell.fresh.o{animation:hellMark .3s cubic-bezier(.1,1.6,.3,1) both,machineSpark .45s ease}
+@keyframes playerSpark{0%{box-shadow:0 0 0 0 #79ffe8bb}65%{box-shadow:0 0 20px 6px #79ffe844}100%{box-shadow:none}}
+@keyframes machineSpark{0%{box-shadow:0 0 0 0 #ff548faa}65%{box-shadow:0 0 20px 6px #ff548f55}100%{box-shadow:none}}
+.arena-stage:after{content:"";position:absolute;inset:-40%;pointer-events:none;background:linear-gradient(100deg,transparent 35%,#ff539b0d 49%,transparent 60%);animation:arenaLight 12s linear infinite}
+@keyframes arenaLight{from{transform:translateX(-80%)}to{transform:translateX(100%)}}
+.arcade-chronicle .story-actions button{position:relative}
+.arcade-chronicle .story-actions button:active{transform:scale(.97)}
+/* Full battle mode keeps the original trial scene but reveals combat stage with real HP */
+.duel-stage[hidden]{display:none!important}
+.duel-stage{position:absolute;inset:0;z-index:5;padding:clamp(14px,2vw,30px);display:flex;flex-direction:column;justify-content:space-between;background:radial-gradient(ellipse at 45% 60%,#592045 0,#240d25 57%,#100b1d);overflow:hidden}
+.duel-stage:before{content:"";position:absolute;inset:-70%;pointer-events:none;background:repeating-conic-gradient(from 0deg,#ff68901a 0 4deg,transparent 4deg 16deg);animation:duelRays 23s linear infinite}
+@keyframes duelRays{to{transform:rotate(360deg)}}
+.duel-head,.duel-fighters,.duel-intent{position:relative;z-index:2}
+.duel-head{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:clamp(10px,3vw,35px);align-items:center;font:800 .67rem system-ui;letter-spacing:.09em}
+.duel-head>div:last-child{text-align:right}
+.duel-health{height:15px;margin:6px 0;background:#320b24;border:2px solid #f4b99c;box-shadow:0 0 12px #fe658744;overflow:hidden}
+.duel-health i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#63eccd,#ceffe5);transition:width .3s ease}
+.duel-health.enemy i{background:linear-gradient(90deg,#ff597b,#ffae86)}
+.duel-round{text-align:center;color:#ffdb8d;font:900 clamp(.7rem,1.2vw,1rem)/1.5 system-ui}
+.duel-fighters{display:flex;gap:15px;justify-content:space-around;align-items:end;flex:1;min-height:0}
+.duel-fighter{display:flex;flex-direction:column;align-items:center;justify-content:end;text-shadow:0 0 15px #ff91ab;font:900 .8rem system-ui;position:relative}
+.duel-fighter .duel-figure{width:clamp(65px,10vw,138px);height:clamp(125px,17vw,225px);background:linear-gradient(135deg,#72fee8,#163146);clip-path:polygon(40% 0,65% 0,77% 13%,73% 30%,100% 58%,85% 65%,75% 43%,73% 100%,55% 100%,50% 70%,40% 100%,18% 100%,30% 42%,14% 65%,0 56%,23% 25%,23% 12%);filter:drop-shadow(0 0 15px #64fff3);animation:duelIdle 1.8s ease-in-out infinite alternate}
+.duel-fighter.enemy .duel-figure{background:linear-gradient(120deg,#ff8cad,#74113b);filter:drop-shadow(0 0 20px #ff579e);animation-delay:.6s}
+.duel-fighter.hit{animation:duelHit .32s ease}
+.duel-versus{align-self:center;color:#ffd39b;font:italic 900 clamp(2rem,5vw,5rem) Impact,sans-serif;text-shadow:4px 5px #9d244c}
+.duel-intent{text-align:center;color:#fff4db;background:#74243b;padding:8px;font:900 .72rem system-ui;letter-spacing:.13em;border:1px solid #ffc57a}
+@keyframes duelIdle{to{transform:translateY(-7px) rotate(2deg)}}
+@keyframes duelHit{20%,60%{transform:translateX(11px);filter:brightness(2)}40%,80%{transform:translateX(-10px)}}
+.theatre.in-duel .court-dialog{border-color:#ffbd73}
+.theatre.in-duel .court-choice{background:linear-gradient(120deg,#5b1e41,#291336);border-color:#ffae8b}
+@media(max-width:900px){.arcade-layout{grid-template-columns:1fr!important}.arcade-sidebar.tabbed-sidebar{min-height:320px;height:370px}.arcade-arena .board,.arcade-arena .board.big{width:min(100%,calc(78dvh - 208px),570px)!important}}
+@media(max-width:620px){.arcade-arena .board,.arcade-arena .board.big{width:min(100%,calc(85dvh - 215px),390px)!important}.duel-stage{padding:9px}.duel-head{font-size:.53rem}.duel-fighter .duel-figure{height:110px;width:70px}.duel-versus{font-size:2rem}}
+@media(prefers-reduced-motion:reduce){.arcade-arena .cell.fresh.x,.arcade-arena .cell.fresh.o,.arena-stage:after,.duel-stage:before,.duel-fighter .duel-figure,.duel-fighter.hit{animation:none!important}}
