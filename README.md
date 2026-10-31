@@ -221,3 +221,19 @@ Tic Tac Hell now has a **five-act interactive narrative** with an ordinary openi
 The original story is implemented in `story-cinema.js` and `story-cinema.css`, with short illustrated, keyboard-accessible scenes that occur at real gameplay milestones. They can be skipped and have reduced-motion support. The courtroom's testimony and verdict text have been rewritten to reinforce the story. A spoiler-heavy character guide, chapter outline and ending descriptions are documented in [STORY.md](STORY.md).
 
 The script introduces no external APIs, copyrighted film/anime clips, non-free sprites or additional runtime dependencies.
+
+## Generated anime chapter artwork (October 31, 2026)
+
+`story-cinema.js` now renders artwork for the five illustrated story acts, rather than using only CSS portraits. Chapter labels and spoken dialogue remain live HTML, so they stay readable and accessible over the images. The image layer has a slow camera push, a low-contrast dialogue scrim and a safe CSS-portrait fallback when an asset is unavailable. Reduced-motion users receive a static scene.
+
+Required **original** artwork files (WebP, 1440 px wide) are:
+
+| Scene | Asset |
+| --- | --- |
+| Prologue | `assets/story/act-0-friendly-match.webp` |
+| First betrayal | `assets/story/act-1-first-impossible-thing.webp` |
+| Hidden witness | `assets/story/act-2-hidden-witness.webp` |
+| Court of Nine | `assets/story/act-3-court-of-nine.webp` |
+| The Last Square | `assets/story/act-5-last-square.webp` |
+
+Act IV reuses the courtroom scene, and both epilogues reuse the final-act artwork with their own dialogue. **Asset publishing:** this editing connection supports UTF-8 GitHub file writes, but not uploading the generated binary WebP files. A matching asset ZIP was prepared in the conversation for upload into the repository, preserving these exact paths. Until those WebP files are published, the game intentionally falls back to the original illustrated CSS scenes. No copyrighted anime/movie footage, external libraries or additional licensing obligations were introduced.
