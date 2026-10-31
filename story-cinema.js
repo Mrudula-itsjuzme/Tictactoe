@@ -54,13 +54,28 @@ const CHAPTERS={
   "Be careful. Power is easiest to recognize when someone else has it."
  ]}
 };
+const ART={
+ prologue:"assets/story/act-0-friendly-match.webp",
+ fracture:"assets/story/act-1-first-impossible-thing.webp",
+ witness:"assets/story/act-2-hidden-witness.webp",
+ court:"assets/story/act-3-court-of-nine.webp",
+ firstVerdict:"assets/story/act-3-court-of-nine.webp",
+ final:"assets/story/act-5-last-square.webp",
+ freedom:"assets/story/act-5-last-square.webp",
+ crown:"assets/story/act-5-last-square.webp"
+};
 let active=null;
 const plain=(s)=>String(s??"");
 function open(id,{onDone,canSkip=true}={}){
  const data=CHAPTERS[id];if(!data)return;
  if(active)active.close(true);
- const root=document.createElement("section");root.className="story-cinema story-"+data.portrait;root.setAttribute("role","dialog");root.setAttribute("aria-modal","true");root.setAttribute("aria-label",data.title);
+ const root=document.createElement("section");root.className="story-cinema story-"+data.portrait+" story-chapter-"+id;root.setAttribute("role","dialog");root.setAttribute("aria-modal","true");root.setAttribute("aria-label",data.title);
  const shade=document.createElement("div");shade.className="story-lighting";
+ const artwork=document.createElement("div");artwork.className="story-artwork";
+ const img=document.createElement("img");img.alt=data.chapter+" illustrated chapter artwork";img.src=ART[id];img.decoding="async";img.loading="eager";
+ img.addEventListener("load",()=>root.classList.add("has-story-art"),{once:true});
+ img.addEventListener("error",()=>{img.hidden=true;root.classList.add("story-art-unavailable");},{once:true});
+ artwork.append(img);
  const scene=document.createElement("div");scene.className="story-scene";
  const top=document.createElement("div");top.className="story-top";
  const chapter=document.createElement("span");chapter.textContent=data.chapter;
@@ -76,7 +91,7 @@ function open(id,{onDone,canSkip=true}={}){
  const nav=document.createElement("div");nav.className="story-navigation";
  const progress=document.createElement("span");const button=document.createElement("button");button.type="button";button.textContent="CONTINUE →";
  nav.append(progress,button);dialog.append(text,nav);
- top.append(chapter,skip);scene.append(top,banner,portraits,dialog);root.append(shade,scene);
+ top.append(chapter,skip);scene.append(artwork,top,banner,portraits,dialog);root.append(shade,scene);
  let index=0,closed=false,previous=document.activeElement;
  const paint=()=>{text.textContent=plain(data.lines[index]);progress.textContent=(index+1)+" / "+data.lines.length;button.textContent=index===data.lines.length-1?"RETURN TO GAME ↗":"NEXT LINE →";root.dataset.line=String(index);};
  const close=(suppressed=false)=>{if(closed)return;closed=true;root.remove();document.removeEventListener("keydown",key,true);if(active?.root===root)active=null;if(previous?.isConnected)previous.focus();if(!suppressed)onDone?.();};
