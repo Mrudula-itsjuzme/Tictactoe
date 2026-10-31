@@ -74,7 +74,10 @@ All terminal commands and operating-system alerts are **fictional in-game intera
 Tictactoe/
 ├── index.html             # Browser game, state and unbeatable AI
 ├── court-drama.js         # Cinematic court state machine and branching dialogues
-├── court-drama.css        # Full-screen courtroom stage and animation
+├── court-drama.css        # Cinematic scenes, motion and character styling
+├── assets/
+│   ├── judge-gridlock.svg # Original Judge portrait
+│   └── counsel-os.svg     # Original defense portrait
 ├── src/
 │   └── TicTacHell.java    # Original Swing desktop game
 ├── LICENSE                # MIT
@@ -99,4 +102,12 @@ MIT. See [LICENSE](LICENSE). Original project by [Mrudula Pedamallu](https://git
 
 ## Courtroom implementation
 
-Court scenes run locally in `court-drama.js` and `court-drama.css` without external fonts, images, libraries or server requests. Entering the courtroom traps keyboard focus within the scene, while Escape or the Exit button postpones a hearing before its verdict. Reduced-motion preferences are supported. The dramatic scenes are intentionally fictional.
+Court scenes run locally in `court-drama.js` and `court-drama.css` with original locally stored SVG character art. No external fonts, video embeds, libraries or server requests are required. Entering the courtroom traps keyboard focus within the scene, while Escape or the Exit button postpones a hearing before its verdict. Reduced-motion preferences are supported. The dramatic scenes are intentionally fictional.
+
+## Cinematic media and rights
+
+The courtroom now features **original anime-inspired vector character art**, full-screen title cutscenes, stylized camera punches, manga speed lines, shifting crimson/gold spotlights, objection slams, and theatrical verdict sequences. The motion graphics are rendered directly in the browser with CSS and JavaScript rather than downloaded movie or anime footage. No third-party YouTube media was copied, scraped, or embedded. The included illustrated SVGs and animations are original source assets distributed under this repository's MIT license.
+
+Why no random YouTube movie clips? YouTube's standard license and platform terms do not automatically authorize copying, editing, or rehosting footage in a game. If licensed CC BY or rights-holder-approved videos are added later, preserve author, title, source URL, exact license, modification notes and any distribution restrictions in a media attribution manifest. The game does not need third-party footage to function.
+
+Animation respects the user's reduced-motion preference. Sound effects are synthesized locally with Web Audio and remain optional.
