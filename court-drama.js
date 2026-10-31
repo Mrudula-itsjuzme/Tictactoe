@@ -47,50 +47,24 @@ charge(){this.cinematic("THE ACCUSATION","STATE YOUR CHARGE");this.scene("BAILIF
 proof(){this.phase("evidence");this.cinematic("EXHIBIT FILED","THE BOARD NEVER LIES");this.scene("YOU · EVIDENCE TABLE","The defense disputes the facts. Which exhibit proves the crime?",mix(proofs).map(x=>({text:x,go:()=>{this.ok2=x===this.case.proof;this.shift(this.ok2?22:-30,this.ok2?-15:17);this.scene(this.ok2?"BAILIFF KERNEL":"COUNSEL O.S.",this.ok2?"EXHIBIT ACCEPTED. The board state agrees with you.":"This exhibit does not prove the accusation. The defense applauds.",[{text:"CROSS-EXAMINE THE DEFENSE",go:()=>this.cross()}]);}})));}
 cross(){this.phase("cross");this.cinematic("CROSS EXAMINATION","BREAK THEIR TESTIMONY");let choices=mix([this.case.rebuttal,"The AI is arrogant, therefore guilty.","The squares are emotionally distressed."]);this.scene("DEFENSE COUNSEL O.S.",this.case.claim+" Answer that, human.",choices.map(x=>({text:x,go:()=>{this.ok3=x===this.case.rebuttal;this.shift(this.ok3?28:-25,this.ok3?-20:16);if(this.ok3){this.cinematic("OBJECTION!","THE TESTIMONY HAS COLLAPSED");this.scene("YOU · CROSS-EXAMINATION",this.case.shout+" The courtroom erupts. Even the jury is listening.",[{text:"CHALLENGE COUNSEL TO A DUEL",go:()=>this.startDuel()}]);}else this.scene("JUDGE GRIDLOCK","A spectacular speech. Unfortunately, zero evidence. The court is delighted.",[{text:"CHALLENGE COUNSEL TO A DUEL",go:()=>this.startDuel()}]);}})));}
 startDuel(){
- if(this.duelStarted)return;this.duelStarted=true;
- this.root.classList.add("in-duel");this.duel.hidden=false;
- this.cinematic("TRIAL BY COMBAT","THE DEFENSE WILL FIGHT FOR ITS VERDICT");
- this.battleMenu("THE BAILIFF","The hearing has become a duel. Read the rival's intent. Break their guard and survive.");
-}
-intent(){return ["STRIKE","HEAVY","GUARD"][(this.battleTurn+this.level-1)%3];}
-battleMenu(speaker,message){
- if(this.playerHP<=0||this.enemyHP<=0){this.endDuel();return;}
- const intent=this.intent();
- this.duel.querySelector(".duel-intent").textContent="ENEMY INTENT: "+(intent==="STRIKE"?"FAST ATTACK":intent==="HEAVY"?"CHARGED HEAVY": "GUARDING");
- this.scene(speaker,message,[
- {text:"⚔ STRIKE · 23 DAMAGE",go:()=>this.battle("strike")},
- {text:"🛡 GUARD · BLOCK & COUNTER",go:()=>this.battle("guard")},
- {text:"✦ BREAK · PIERCE DEFENSE",go:()=>this.battle("break")}
- ]);
-}
-battle(move){
- if(this.playerHP<=0||this.enemyHP<=0)return;
- const intent=this.intent();let dealt=0,taken=0,counter=false;
- if(move==="strike")dealt=intent==="GUARD"?7:23;
- if(move==="break"){dealt=intent==="GUARD"?33:15;if(intent==="HEAVY")counter=true;}
- if(move==="guard")dealt=intent==="STRIKE"?11:0;
- this.enemyHP=Math.max(0,this.enemyHP-dealt);
- if(this.enemyHP>0&&!counter){
-  const power=intent==="HEAVY"?23+this.level*2:intent==="STRIKE"?12+this.level:0;
-  taken=move==="guard"?Math.max(0,power-19):power;
-  this.playerHP=Math.max(0,this.playerHP-taken);
- }
- this.battleTurn++;this.syncHealth();
- const opponent=this.duel.querySelector(".duel-fighter.enemy"),player=this.duel.querySelector(".duel-fighter.player");
- opponent.classList.remove("hit");player.classList.remove("hit");void this.duel.offsetWidth;
- if(dealt)opponent.classList.add("hit");if(taken)player.classList.add("hit");
- tone(dealt>20?120:230);
- const report=(move.toUpperCase()+" deals "+dealt+" damage. "+(counter?"Their heavy attack was interrupted!":taken?"You take "+taken+" damage.":"You avoided damage."));
- if(this.enemyHP<=0||this.playerHP<=0){this.scene("BAILIFF KERNEL",report,[{text:"HEAR THE FINAL VERDICT",go:()=>this.endDuel()}]);return;}
- this.battleMenu("BAILIFF KERNEL",report);
+ if(this.duelStarted)return;
+ this.duelStarted=true;this.root.classList.add("in-duel");this.duel.hidden=true;
+ this.cinematic("TRIAL BY COMBAT","A / D MOVE · W JUMP · J ATTACK · K HEAVY · L BLOCK · SPACE DODGE");
+ if(!window.CourtFight){this.scene("SYSTEM","The duel could not load.",[{text:"RETURN TO COURT",go:()=>this.verdict()}]);return;}
+ this.root.querySelector(".court-dialog").hidden=true;
+ this.fighter=new window.CourtFight({arena:this.root.querySelector(".court-stage"),level:this.level,sound:window.__courtSound,onEnd:won=>{
+  if(this.done)return;
+  this.battleWon=won;this.fighter?.destroy();this.fighter=null;
+  this.root.querySelector(".court-dialog").hidden=false;
+  this.endDuel();
+ }});
 }
 endDuel(){
- this.battleWon=this.enemyHP<=0&&this.playerHP>0;
- this.cinematic(this.battleWon?"KNOCKOUT!":"DEFEATED",this.battleWon?"THE HUMAN HOLDS THE COURT":"THE DEFENSE CLAIMS THE BENCH");
- this.scene("BAILIFF KERNEL",this.battleWon?"Counsel O.S. falls. The courtroom erupts.":"The machine remains standing. Your evidence will be dismissed.",[{text:"RECEIVE VERDICT",go:()=>this.verdict()}]);
+ this.cinematic(this.battleWon?"KNOCKOUT!":"DEFEATED",this.battleWon?"THE HUMAN HAS DEFEATED COUNSEL O.S.":"THE DEFENSE CLAIMS THE BENCH");
+ this.scene("BAILIFF KERNEL",this.battleWon?"Counsel O.S. falls. The courtroom erupts.":"The machine remains standing. Your evidence is at risk.",[{text:"RECEIVE VERDICT",go:()=>this.verdict()}]);
 }
 verdict(){this.phase("verdict");const guilty=this.battleWon&&this.ok1&&this.ok2&&this.ok3&&this.cred>=55;this.cinematic(guilty?"GUILTY!":"NOT GUILTY",guilty?"THE JURY HAS DEFIED ITS MASTER":"JUSTICE HAS BEEN OVERRULED","verdict");this.scene("JUDGE GRIDLOCK",guilty?"Against all expectations, the evidence is overwhelming. Guilty. The player is awarded two injunctions to block future cheating.":"The prosecution failed to prove its case. The defendant walks free, and this exhibit is lost.",[{text:guilty?"ENFORCE THE VERDICT":"RETURN TO THE BOARD",go:()=>{this.opts.onVerdict(guilty,{credibility:this.cred,bias:this.bias});this.close();}}]);}
-close(){if(this.done)return;this.done=true;clearTimeout(this.cutsceneTimer);this.root.remove();document.body.classList.remove("court-active");active=null;this.focus?.focus?.();}
+close(){if(this.done)return;this.fighter?.destroy();this.done=true;clearTimeout(this.cutsceneTimer);this.root.remove();document.body.classList.remove("court-active");active=null;this.focus?.focus?.();}
 }
 window.CourtDrama={open(o){if(active)return;active=new Court(o);},setSound(v){window.__courtSound=!!v;}};
 })();
