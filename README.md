@@ -50,7 +50,7 @@ Hell mode contains five collectible clues, an evidence-based courtroom, a fictio
 
 1. Play Hell mode until the board expands to 10×10.
 2. Collect all five clues, one for each five player moves.
-3. Catch the AI cheating, then open **Courtroom**. Match each evidence report to the correct charge (illegal board expansion, extra turn, or erased marks). Win **three guilty verdicts**. Each guilty verdict earns two injunction charges that block future cheating attempts.
+3. Catch the AI cheating, then open **Courtroom**. This launches a cinematic full-screen trial with Judge Gridlock, Defense Counsel O.S., and the nine-square jury. Identify the correct charge, present matching board-state evidence, then cross-examine the defense with the correct contradiction. All three stages must succeed to earn a **guilty** verdict. Win **three cases**. Each guilty verdict grants two injunction charges that block future cheating attempts.
 4. Open **Terminal** and enter `who_makes_the_rules`.
 5. Choose **Delete the rules** or **Become the AI**.
 
@@ -62,7 +62,8 @@ All terminal commands and operating-system alerts are **fictional in-game intera
 - Responsive layout for phones, tablets and desktops.
 - Click or keyboard-activate square buttons; descriptive accessible labels, focus indicators, and live status messages.
 - Scoreboard, opponent personality, mode and optional sound effects persisted in browser local storage.
-- A persistent-in-round courtroom docket tracks evidence, verdicts and anti-cheat injunctions, with real consequences for incorrect accusations.
+- An immersive courtroom with character roles, legal charges, physical evidence, cross-examination, jury credibility/bias meters, theatrical verdicts and actual protective injunctions.
+- The game preserves pending evidence if you exit court before a verdict. An incorrect prosecution consumes the exhibit, while a guilty verdict rewards you with two future cheat blocks.
 - Reduced-motion preference respected; audio disabled by default.
 - No external JavaScript, trackers, accounts, cookies or API keys.
 - Restart the round or reset the scoreboard at any time.
@@ -71,7 +72,9 @@ All terminal commands and operating-system alerts are **fictional in-game intera
 
 ```text
 Tictactoe/
-├── index.html             # Browser game, styles, state and AI
+├── index.html             # Browser game, state and unbeatable AI
+├── court-drama.js         # Cinematic court state machine and branching dialogues
+├── court-drama.css        # Full-screen courtroom stage and animation
 ├── src/
 │   └── TicTacHell.java    # Original Swing desktop game
 ├── LICENSE                # MIT
@@ -93,3 +96,7 @@ Small UI, accessibility, gameplay or narrative improvements are welcome. Please 
 ## License
 
 MIT. See [LICENSE](LICENSE). Original project by [Mrudula Pedamallu](https://github.com/Mrudula-itsjuzme).
+
+## Courtroom implementation
+
+Court scenes run locally in `court-drama.js` and `court-drama.css` without external fonts, images, libraries or server requests. Entering the courtroom traps keyboard focus within the scene, while Escape or the Exit button postpones a hearing before its verdict. Reduced-motion preferences are supported. The dramatic scenes are intentionally fictional.
