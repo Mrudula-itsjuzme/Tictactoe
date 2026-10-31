@@ -6,7 +6,7 @@ class FightEngine{
   this.arena=arena;this.level=level;this.onEnd=onEnd;this.sound=sound;this.live=true;this.finished=false;
   this.keys=new Set();this.player={x:18,y:0,hp:100,max:100,facing:1,stun:0,cool:0,inv:0,guard:false,air:0,velocity:0,action:"idle"};
   this.bot={x:76,y:0,hp:78+level*14,max:78+level*14,facing:-1,stun:0,cool:0,inv:0,guard:false,action:"idle"};
-  this.elapsed=0;this.enemyState="approach";this.enemyTimer=.9;this.attackId=0;this.attacks=0;this.last=0;this.raf=0;this.focus=document.activeElement;
+  this.elapsed=0;this.enemyState="approach";this.enemyTimer=.6;this.attackId=0;this.attacks=0;this.last=0;this.raf=0;this.focus=document.activeElement;
   this.canvas=document.createElement("div");this.canvas.className="realtime-duel";this.canvas.tabIndex=0;this.canvas.setAttribute("role","application");this.canvas.setAttribute("aria-label","Real-time courtroom fight. A and D move, W jumps, J attacks, K heavy attacks, L blocks, Space dodges.");
   this.canvas.innerHTML='<div class="fight-head"><div class="fight-side"><b>THE HUMAN</b><div class="fight-meter"><i id="fight-human-hp"></i></div><span id="fight-human-text"></span></div><strong class="fight-level">COURTROOM FIGHT<br>LEVEL '+level+'</strong><div class="fight-side"><b>COUNSEL O.S.</b><div class="fight-meter hostile"><i id="fight-bot-hp"></i></div><span id="fight-bot-text"></span></div></div><div class="fight-announcer" aria-live="polite">THE DEFENSE HAS CHALLENGED YOU.</div><div class="fight-floor"><div class="fighter human"><div class="fighter-body"></div><div class="fighter-name">YOU</div></div><div class="fighter ai"><div class="fighter-body"></div><div class="fighter-name">COUNSEL O.S.</div></div><div class="fight-warning"></div></div><div class="fight-help">A/D MOVE · W JUMP · J STRIKE · K HEAVY · L GUARD · SPACE DODGE · P PAUSE</div><div class="fight-touch"><button data-key="a" aria-label="Move left">◀</button><button data-key="d" aria-label="Move right">▶</button><button data-key="w">JUMP</button><button data-key="j">HIT</button><button data-key="k">HEAVY</button><button data-key="l">BLOCK</button><button data-key=" ">DODGE</button></div>';
   arena.append(this.canvas);this.humanEl=this.canvas.querySelector(".fighter.human");this.botEl=this.canvas.querySelector(".fighter.ai");this.announcer=this.canvas.querySelector(".fight-announcer");this.warning=this.canvas.querySelector(".fight-warning");
@@ -23,13 +23,13 @@ class FightEngine{
  attack(kind){const p=this.player;if(this.paused||!this.live||p.cool>0||p.stun>0)return;const heavy=kind==="heavy";p.cool=heavy?.8:.34;p.action=kind;p.facing=Math.sign(this.bot.x-p.x)||1;const delay=heavy?220:85;const attackNumber=++this.attackId;setTimeout(()=>{if(!this.live||this.paused||attackNumber!==this.attackId)return;const b=this.bot;const reach=heavy?21:15;if(Math.abs(p.x-b.x)>reach||p.y>20){this.announce("WHIFF! GET CLOSER.");return;}const dmg=heavy?27:13;const actual=b.guard&&!heavy?Math.ceil(dmg*.2):dmg;b.hp=clamp(b.hp-actual,0,b.max);b.stun=heavy?.48:.17;b.x=clamp(b.x+p.facing*(heavy?6:3),7,93);this.announce((heavy?"HEAVY BREAK":"STRIKE")+" · "+actual+" DAMAGE");this.flash(this.botEl);if(b.hp<=0)this.finish(true);},delay);}
  flash(el){el.classList.remove("damaged");void el.offsetWidth;el.classList.add("damaged");}
  aiAction(){const p=this.player,b=this.bot,dist=Math.abs(p.x-b.x);if(b.stun>0||this.paused)return;const approaching=dist>17;
- if(approaching){b.guard=false;b.x+=Math.sign(p.x-b.x)*(7+this.level*.6)*.08;this.enemyState="approach";return;}
+ if(approaching){b.guard=false;b.x+=Math.sign(p.x-b.x)*(7+this.level*.6)*.28;this.enemyState="approach";this.enemyTimer=.15;return;}
  const choices=["strike","guard","heavy","strike","dodge"];const choice=choices[(this.attacks+this.level+Math.floor(p.hp/30))%choices.length];this.attacks++;this.enemyState=choice;
  if(choice==="guard"){b.guard=true;this.announce("ENEMY GUARDS · USE HEAVY TO BREAK");this.enemyTimer=.8;return;}
  b.guard=false;
  if(choice==="dodge"){b.x=clamp(b.x+(b.x>p.x?9:-9),7,93);this.announce("COUNSEL O.S. EVADES");this.enemyTimer=.5;return;}
  const heavy=choice==="heavy";this.announce(heavy?"WARNING: HEAVY ATTACK CHARGING!":"WARNING: INCOMING STRIKE!");
- this.warning.classList.add("active");const stamp=++this.attackId;const hitDelay=heavy?680:400;
+ this.warning.classList.add("active");const hitDelay=heavy?680:400;
  setTimeout(()=>{if(!this.live||this.paused)return;this.warning.classList.remove("active");if(Math.abs(p.x-b.x)>(heavy?19:15)||p.inv>0||p.y>17){this.announce("ENEMY MISSED!");return;}
  const power=heavy?19+this.level*3:9+this.level*2;
  const damage=this.keys.has("l")?Math.ceil(power*.15):power;
