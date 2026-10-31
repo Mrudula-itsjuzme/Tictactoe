@@ -1,0 +1,54 @@
+/* COURTROOM 8 · Cinematic trial and combat redesign. Original CSS art. */
+.theatre{background:radial-gradient(ellipse at 50% -5%,#5a1b38 0,#130a17 52%,#08060e 100%);font-family:ui-sans-serif,system-ui,sans-serif}
+.court-wrap{width:min(100%,1450px);max-width:1450px;height:100dvh;min-height:0;overflow:hidden;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto minmax(160px,auto);gap:9px;padding:12px clamp(12px,2vw,32px)}
+.court-head{padding:5px 0 11px;border-bottom:1px solid #e6b88370;align-items:center}
+.court-head h2{font-family:Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif;font-size:clamp(1.6rem,3vw,3rem);letter-spacing:.035em;color:#fff0e1}
+.court-head em{font-family:Georgia,serif;text-decoration:underline;text-decoration-color:#ff537c;text-underline-offset:4px}
+.court-head span{color:#f2c88c;font-size:.62rem}
+.court-head .court-leave{border-radius:3px;border-color:#faac8380;background:#250e20;font-weight:900}
+.court-bars{display:flex;gap:22px;background:#190d1c;padding:8px 12px;border:1px solid #754661;align-items:center}
+.court-bars>label{flex:1}.court-bars .meter{height:7px}
+.court-stage{min-height:0!important;border:2px solid #e4a16b;border-radius:3px;box-shadow:inset 0 0 75px #0009,0 0 45px #ef397033;isolation:isolate;background:radial-gradient(ellipse at 50% 12%,#e6a66b30,transparent 34%),linear-gradient(180deg,#471728 0,#251323 62%,#0c0b17 100%)}
+.court-stage:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.75;background:repeating-linear-gradient(90deg,transparent 0 12%,#efb67c19 12.4% 13.1%,transparent 14% 25%),linear-gradient(45deg,transparent 45%,#ffefca09 46%,transparent 50%);animation:none}
+.court-cast{width:100%;height:100%;display:grid;grid-template-columns:minmax(0,1fr) minmax(200px,1.5fr) minmax(0,1fr);gap:10px;padding:12px clamp(10px,2vw,38px) 30px;align-items:end}
+.court-actor{align-self:end;display:grid;justify-items:center;gap:6px}
+.court-face{height:clamp(125px,27vh,270px)!important;width:clamp(105px,14vw,200px)!important;border-radius:4px!important;border:3px solid #ffbe8b!important;box-shadow:8px 8px #110916,0 0 28px #f46c8e4d!important;transform:skew(-3deg) rotate(-1deg)!important;animation:characterEntrance .55s ease both!important}
+.counsel .court-face{transform:skew(3deg) rotate(1deg)!important;border-color:#e88de9!important}
+.court-actor strong{background:#100a17d9;border:1px solid #ae6486;padding:7px 10px;color:#fff0da;font:900 clamp(.6rem,1vw,.88rem) ui-sans-serif,system-ui;text-align:center;letter-spacing:.06em}
+.court-actor small{font-size:.52rem;letter-spacing:.08em}
+.court-center{align-self:center;position:relative}
+.court-seal{font:900 clamp(3rem,7vw,7rem) Georgia,serif;color:#ffc17f;text-shadow:0 0 35px #ffd18a88}
+.court-center h3{font:italic 900 clamp(1.15rem,3vw,2.7rem)/1.1 Georgia,serif;color:#fff0d4;max-width:100%;overflow-wrap:anywhere;margin:7px 0}
+.court-center p{color:#e5a97f}
+.court-jury{position:absolute;bottom:0;left:0;right:0;z-index:4;padding:7px;background:#130b17d9}
+.court-jury span{padding:2px 6px}
+.court-bench-plaque{position:absolute;bottom:45px;left:50%;transform:translateX(-50%);white-space:nowrap;color:#a78b94;font:900 .52rem ui-sans-serif,system-ui;letter-spacing:.12em;opacity:.8}
+.court-act-track{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:3px}
+.court-act-track span{min-width:0;text-align:center;padding:9px 2px;background:#241526;border:1px solid #644254;color:#a88da1;font:800 clamp(.48rem,.72vw,.64rem)/1.2 ui-sans-serif,system-ui;letter-spacing:.07em}
+.court-act-track .complete{border-color:#86dfbd;color:#9ef2d2;background:#10302b}
+.court-act-track .current{border-color:#ffd18f;background:#7c244e;color:#ffe3af;box-shadow:inset 0 -3px #f7bc75}
+.court-dialog{min-height:0;max-height:35dvh;padding:15px 20px;border:1px solid #e0a37c;border-radius:3px;overflow:auto;background:linear-gradient(110deg,#2a152c,#100d1b);display:flex;flex-direction:column}
+.court-dialog .court-speaker{color:#ffca8f;font:900 .72rem ui-sans-serif,system-ui;letter-spacing:.14em}
+.court-dialog .court-line{font:700 clamp(.97rem,1.6vw,1.25rem)/1.4 Georgia,serif;min-height:0;margin:8px 0 12px}
+.court-dialog .court-prompt{min-height:0}
+.court-options{gap:7px;margin-top:auto}
+.court-choice{font-size:.73rem;padding:10px 12px;box-shadow:none;border-radius:2px;flex:1 1 auto}
+.court-dialog p{margin:8px 0 0;font-size:.55rem}
+.theatre.fight-active .court-bars,.theatre.fight-active .court-act-track,.theatre.fight-active .court-dialog{display:none!important}
+.theatre.fight-active .court-wrap{grid-template-rows:auto minmax(0,1fr);gap:12px}
+.theatre.fight-active .court-stage{min-height:0}
+.theatre.fight-active .court-cast,.theatre.fight-active .court-jury,.theatre.fight-active .court-bench-plaque{display:none}
+.theatre.fight-active .realtime-duel{border:2px solid #ffb876;box-shadow:inset 0 0 50px #ffa06a2e}
+.fight-v2 .fight-floor{background:radial-gradient(ellipse at 50% 90%,#f4aa8c4a,transparent 62%),linear-gradient(180deg,#2b1034,#35152e 60%,#140c1c);border-bottom:22px solid #ad5274}
+.fight-v2 .fight-floor:before{opacity:.6;background:linear-gradient(100deg,transparent 25%,#ffe29e1b 32%,transparent 37%,transparent 62%,#f873be18 68%,transparent 72%),repeating-linear-gradient(90deg,#0000 0 17%,#f9b58925 17.4% 18%,#0000 18.6% 33%)}
+.fight-v2 .fight-floor:after{z-index:1;content:"";position:absolute;inset:auto 0 0;height:12%;background:repeating-linear-gradient(90deg,#ffb18c2e 0 3px,transparent 3px 30px);transform:perspective(180px) rotateX(35deg);pointer-events:none}
+.fight-v2 .fighter{z-index:3}
+.fight-v2 .fight-announcer{background:#451932;font-size:.82rem;border-bottom:2px solid #ffb57b}
+.fight-v2 .fight-help{background:#100b19;color:#d4ffee}
+.fight-v2 .fight-meter{height:16px;border-color:#efb88a}
+.fight-v2 .fight-meter.stamina{height:8px}
+.fight-v2 .fight-touch{background:#231328}
+.fight-v2 .fight-touch button{border:1px solid #ffbb92;background:#47223d}
+@media(max-height:760px){.court-wrap{gap:6px;padding-block:7px}.court-face{height:clamp(100px,22vh,180px)!important}.court-dialog{max-height:33dvh;padding:9px 14px}.court-act-track span{padding:5px 2px}.court-head h2{font-size:1.8rem}}
+@media(max-width:720px){.court-wrap{height:100dvh;padding:9px;gap:6px}.court-head h2{font-size:clamp(1rem,4.1vw,1.5rem)}.court-head span{font-size:.45rem}.court-bars{padding:5px;font-size:.57rem}.court-stage{min-height:0}.court-cast{grid-template-columns:1fr 1.1fr 1fr;gap:2px;padding:5px 5px 20px}.court-face{width:clamp(61px,18vw,115px)!important;height:clamp(90px,19vh,145px)!important}.court-actor strong{font-size:.49rem;padding:4px}.court-actor small{display:none}.court-center h3{font-size:clamp(.8rem,3.2vw,1.2rem)}.court-seal{font-size:2.4rem}.court-bench-plaque{display:none}.court-act-track span{font-size:.39rem;letter-spacing:0}.court-dialog{max-height:38dvh;padding:9px 11px}.court-options{display:grid;grid-template-columns:1fr 1fr}.court-choice{font-size:.65rem;padding:8px}.court-dialog p{display:none}.fight-v2 .fight-head{grid-template-columns:1fr 90px 1fr}}
+@media(prefers-reduced-motion:reduce){.court-face{animation:none!important}}
