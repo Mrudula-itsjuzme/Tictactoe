@@ -246,3 +246,11 @@ Five original 4-second **muted, looping H.264 MP4** motion clips accompany the W
 `story-cinema.js` now selects MP4 motion when available, retains the WebP still as fallback, stops playback when scenes close, and respects reduced-motion preferences. Both endings reuse the Act V clip; the first-verdict scene reuses Act III.
 
 **Publication requirement:** Upload the supplied ZIP preserving its `assets/story/` paths. The GitHub text-edit connector can update playback code but cannot upload these binary assets directly. Until the ZIP is committed into the repository, scenes keep their CSS/still fallback instead of displaying new clips.
+
+## Non-media polish and interaction fixes
+
+- Added arrow-key navigation between playable board cells. Use Enter/Space to place X; keyboard focus is restored after board redraws where possible.
+- Real score counts remain separate from the machine's theatrical forged tally.
+- Court case selection now prioritizes the highest-provenance pending exhibit rather than blindly opening the oldest. Acquittals remain documented.
+- The opening X-to-O corruption incident now records the original description so edited evidence is correctly identified as altered.
+- Cinematic video files are optional. The shipped CSS scenes remain functional when clips are not committed.
