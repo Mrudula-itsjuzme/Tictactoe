@@ -1,0 +1,29 @@
+/* Real-time courtroom arena. Original silhouette graphics and physical keyboard play. */
+.realtime-duel{position:absolute;inset:0;z-index:15;overflow:hidden;display:flex;flex-direction:column;background:radial-gradient(ellipse at 55% 60%,#781e3b66,transparent 58%),linear-gradient(155deg,#190c24,#3c102e 54%,#100715);outline:none;color:#fff6e7}
+.realtime-duel:before{content:"";pointer-events:none;position:absolute;inset:-50%;opacity:.22;background:repeating-conic-gradient(#ffb98e45 0 5deg,transparent 5deg 18deg);animation:fightRotate 36s linear infinite}
+@keyframes fightRotate{to{transform:rotate(360deg)}}
+.fight-head{position:relative;z-index:3;display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:16px;padding:14px 17px;background:#0c091bbb;font:900 .69rem/1.5 ui-sans-serif,system-ui;letter-spacing:.1em}
+.fight-side:last-child{text-align:right}.fight-side>b{display:block;color:#fff5dc}.fight-level{text-align:center;color:#ffd28b;align-self:center}
+.fight-meter{height:14px;border:2px solid #c8959f;background:#321627;margin:5px 0}
+.fight-meter i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#67efd5,#dafff3);transition:width .2s}
+.fight-meter.hostile i{background:linear-gradient(90deg,#ffb474,#ff3c85)}
+.fight-announcer{z-index:4;position:relative;text-align:center;background:#3c1938cc;padding:7px;color:#ffd69e;font:900 clamp(.7rem,1.25vw,.96rem) system-ui;letter-spacing:.08em;min-height:34px}
+.fight-floor{position:relative;flex:1;min-height:140px;border-bottom:13px solid #bd677a;background:radial-gradient(ellipse at 50% 100%,#ff917e2e,transparent 65%);overflow:hidden}
+.fight-floor:after{content:"";position:absolute;bottom:0;left:0;width:100%;height:20%;background:repeating-linear-gradient(90deg,#d4758938 0 3px,transparent 3px 30px);transform:perspective(180px) rotateX(45deg);transform-origin:bottom}
+.fighter{position:absolute;bottom:13%;width:clamp(50px,8vw,105px);height:clamp(100px,17vw,190px);display:flex;justify-content:end;align-items:center;flex-direction:column;transition:left .06s linear,bottom .05s linear;filter:drop-shadow(0 0 17px #0009);z-index:2}
+.fighter-body{position:relative;width:80%;height:86%;background:linear-gradient(140deg,#b1fff0,#2da5a5 52%,#12536b);clip-path:polygon(35% 0,65% 0,85% 15%,82% 29%,100% 52%,89% 61%,72% 45%,69% 100%,52% 100%,50% 65%,37% 100%,18% 100%,29% 45%,12% 60%,0 54%,19% 28%,16% 13%);animation:duelIdle 1.3s ease-in-out infinite alternate}
+.fighter.ai .fighter-body{background:linear-gradient(140deg,#ffc4d3,#ed4082 50%,#7a1b68)}
+.fighter-name{font:900 .59rem system-ui;letter-spacing:.09em;white-space:nowrap;color:#fff6de;text-shadow:1px 2px #0e0b12}
+.fighter.blocking .fighter-body{filter:drop-shadow(0 0 12px #ffdd90) brightness(1.4)}
+.fighter.dodging{opacity:.45;filter:drop-shadow(0 0 24px cyan)}
+.fighter.damaged{animation:realHit .28s ease}
+@keyframes realHit{0%,100%{filter:brightness(1)}30%,70%{filter:brightness(3) drop-shadow(0 0 23px #fff);translate:8px 0}50%{translate:-7px 0}}
+.fight-warning{position:absolute;inset:14% 3% 20%;border:4px solid transparent;pointer-events:none;z-index:4}
+.fight-warning.active{border-color:#ff316a;box-shadow:inset 0 0 35px #ff316a66,0 0 40px #ff316a;animation:fightAlarm .3s linear infinite alternate}
+@keyframes fightAlarm{to{opacity:.25}}
+.fight-help{position:relative;z-index:3;text-align:center;padding:9px;background:#0f0a1e;color:#99fee9;font:900 .68rem/1.4 system-ui;letter-spacing:.06em}
+.fight-touch{z-index:3;display:none;gap:5px;flex-wrap:wrap;justify-content:center;padding:8px;background:#170d23}
+.fight-touch button{padding:8px 10px;min-width:44px;border-radius:6px;background:#4b2046;border:1px solid #ffa7ab;color:#fff;font:900 .72rem system-ui;touch-action:none}
+@media(max-width:900px),(pointer:coarse){.fight-touch{display:flex}}
+@media(max-width:600px){.fight-head{padding:7px;gap:7px;font-size:.55rem}.fight-level{font-size:.57rem}.fight-help{font-size:.54rem}.fighter{width:58px;height:115px}.fight-announcer{font-size:.7rem}}
+@media(prefers-reduced-motion:reduce){.realtime-duel:before,.fighter-body,.fight-warning.active,.fighter.damaged{animation:none!important}}
