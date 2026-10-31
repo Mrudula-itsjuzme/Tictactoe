@@ -30,7 +30,7 @@ button,select,input{font:inherit}button{cursor:pointer}button:focus-visible,sele
 <label class="field" for="difficulty">Opponent <select id="difficulty"><option value="easy">Chill (still unbeatable)</option><option value="medium">Clever (still unbeatable)</option><option value="hard" selected>Merciless (unbeatable)</option></select></label>
 <label class="field" for="sound">Sound effects <input id="sound" type="checkbox"></label></div>
 <div class="stats"><div class="stat"><strong id="wins">0</strong><small>YOU</small></div><div class="stat"><strong id="losses">0</strong><small>AI</small></div><div class="stat"><strong id="draws">0</strong><small>DRAWS</small></div></div></section>
-<section class="panel chronicle"><div class="label">THE CHAOS DEPARTMENT</div><h2>Incident log</h2><div class="story-actions"><button class="btn" id="court">⚖ Courtroom</button><button class="btn" id="terminal">⌘ Terminal</button><button class="btn" id="fake-os">⚠ Fake OS alert</button><button class="btn" id="clue">✦ Case file</button></div><p class="clues" id="clue-count">Hell clues collected: 0 / 5</p><div class="log" id="log" aria-label="Game log" aria-live="polite"></div></section></aside></main>
+<section class="panel chronicle"><div class="label">THE CHAOS DEPARTMENT</div><h2>Incident log</h2><div class="story-actions"><button class="btn" id="court">⚖ Courtroom</button><button class="btn" id="terminal">⌘ Terminal</button><button class="btn" id="fake-os">⚠ Fake OS alert</button><button class="btn" id="clue">✦ Case dossier</button></div><p class="clues" id="clue-count">Hell clues collected: 0 / 5</p><div class="log" id="log" aria-label="Game log" aria-live="polite"></div></section></aside></main>
 <div class="footer"><span>Built for humans who enjoy losing arguments to rectangles.</span><span><a href="https://github.com/Mrudula-itsjuzme/Tictactoe" target="_blank" rel="noopener noreferrer">Source on GitHub ↗</a> · No tracking, no accounts</span></div>
 </div>
 <dialog id="modal" aria-labelledby="modal-title"><h2 id="modal-title"></h2><p id="modal-text"></p><div id="modal-extras"></div><div class="controls" id="modal-actions"></div></dialog>
@@ -42,7 +42,7 @@ const taunts=["Your confidence is statistically concerning.","My lawyer approved
 const defaults={wins:0,losses:0,draws:0,sound:false,mode:"fair",difficulty:"hard"};
 let settings={...defaults};
 try{const value=JSON.parse(localStorage.getItem("tic-tac-hell-v2")||"{}");for(const k of Object.keys(defaults))if(typeof value[k]===typeof defaults[k])settings[k]=value[k];}catch{}
-let board=[],n=3,turns=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null;
+let board=[],n=3,turns=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[];
 const save=()=>{try{localStorage.setItem("tic-tac-hell-v2",JSON.stringify(settings));}catch{}};
 const random=a=>a[Math.floor(Math.random()*a.length)];
 const empty=()=>board.flatMap((row,r)=>row.map((v,c)=>v?"":r*n+c)).filter(v=>v!=="");
@@ -52,31 +52,75 @@ function tone(freq){if(!settings.sound)return;try{const C=window.AudioContext||w
 function log(message){const p=document.createElement("p");p.textContent=message;$("log").prepend(p);while($("log").children.length>35)$("log").lastChild.remove();}
 function say(message){$("status").textContent=message;log(message);}
 function updateScore(){["wins","losses","draws"].forEach(k=>$(k).textContent=settings[k]);save();}
-function reset(){session++;n=3;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Welcome to Tic Tac Hell. Winning is subject to judicial review.");draw();}
+function reset(){session++;n=3;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Welcome to Tic Tac Hell. Winning is subject to judicial review.");draw();}
 function lines(k){const arr=[],d=[[1,0],[0,1],[1,1],[1,-1]];for(let r=0;r<n;r++)for(let c=0;c<n;c++)for(const [dr,dc] of d){const e=[];for(let j=0;j<k;j++){const y=r+j*dr,x=c+j*dc;if(y<0||x<0||y>=n||x>=n)break;e.push(y*n+x);}if(e.length===k)arr.push(e);}return arr;}
 function match(who,oneAway=false){for(const line of lines(Math.min(n,5))){const values=line.map(get);if(oneAway?values.filter(v=>v===who).length===line.length-1&&values.includes(""):values.every(v=>v===who))return line;}return null;}
-function draw(){const el=$("board");el.replaceChildren();el.style.gridTemplateColumns="repeat("+n+",1fr)";el.classList.toggle("big",n>3);$("board-size").textContent=n+" × "+n+" BOARD";$("mode-label").textContent=settings.mode==="fair"?"FAIR PLAY":"CHAOS PROTOCOL ACTIVE";$("round-label").textContent=finished?"Round complete.":thinking?"The AI is plotting.":"Your move, troublemaker.";$("difficulty").disabled=settings.mode==="hell";$("clue-count").textContent="Hell clues collected: "+clues+" / 5 · Tricks: "+cheats;for(let i=0;i<n*n;i++){const b=document.createElement("button"),v=get(i);b.type="button";b.className="cell"+(v?" "+v.toLowerCase():"")+(winning.includes(i)?" win":"");b.textContent=v;b.setAttribute("aria-label","Row "+(Math.floor(i/n)+1)+", column "+(i%n+1)+(v?", "+v:" empty"));b.disabled=finished||thinking||!!v;b.addEventListener("click",()=>move(i));el.append(b);}}
+function draw(){const el=$("board");el.replaceChildren();el.style.gridTemplateColumns="repeat("+n+",1fr)";el.classList.toggle("big",n>3);$("board-size").textContent=n+" × "+n+" BOARD";$("mode-label").textContent=settings.mode==="fair"?"FAIR PLAY":"CHAOS PROTOCOL ACTIVE";$("round-label").textContent=finished?"Round complete.":thinking?"The AI is plotting.":"Your move, troublemaker.";$("difficulty").disabled=settings.mode==="hell";$("clue-count").textContent="Evidence: "+evidence.length+" · Guilty verdicts: "+convictions+"/3 · Clues: "+clues+"/5 · Shield: "+protection;for(let i=0;i<n*n;i++){const b=document.createElement("button"),v=get(i);b.type="button";b.className="cell"+(v?" "+v.toLowerCase():"")+(winning.includes(i)?" win":"");b.textContent=v;b.setAttribute("aria-label","Row "+(Math.floor(i/n)+1)+", column "+(i%n+1)+(v?", "+v:" empty"));b.disabled=finished||thinking||!!v;b.addEventListener("click",()=>move(i));el.append(b);}}
 function conclude(who,line){finished=true;winning=line||[];if(who==="X"){settings.wins++;say("YOU WIN. The squares applaud. Reluctantly.");tone(700);}else if(who==="O"){settings.losses++;say("AI wins. It will never be humble about this.");tone(190);}else{settings.draws++;say("A draw. A ceasefire with nine squares.");tone(390);}updateScore();draw();}
 function evaluate3(cells){const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];for(const line of wins){const v=cells[line[0]];if(v&&line.every(i=>cells[i]===v))return v;}return cells.every(Boolean)?"draw":null;}
 function minimax(b,depth,isAI,alpha,beta){const v=evaluate3(b);if(v)return v==="O"?10-depth:v==="X"?depth-10:0;let best=isAI?-Infinity:Infinity;for(const i of [4,0,2,6,8,1,3,5,7]){if(b[i])continue;b[i]=isAI?"O":"X";let score=minimax(b,depth+1,!isAI,alpha,beta);b[i]="";best=isAI?Math.max(best,score):Math.min(best,score);if(isAI)alpha=Math.max(alpha,best);else beta=Math.min(beta,best);if(beta<=alpha)break;}return best;}
 function pickAI(){const available=empty();if(!available.length)return null;const flat=board.flat();let best=-Infinity,choices=[];for(const i of available){flat[i]="O";const score=minimax(flat,0,false,-Infinity,Infinity);flat[i]="";if(score>best){best=score;choices=[i];}else if(score===best)choices.push(i);}/* Every personality chooses only minimax-optimal moves. The AI cannot lose from an empty 3x3 board. */return random(choices);}
 function move(i){if(finished||thinking||get(i))return;set(i,"X");turns++;tone(520);if(settings.mode==="fair"){const w=match("X");if(w)return conclude("X",w);if(!empty().length)return conclude("draw");thinking=true;say("The AI is considering your questionable life choices.");draw();const stamp=session;setTimeout(()=>{if(stamp!==session)return;thinking=false;const p=pickAI();if(p!==null)set(p,"O");tone(310);const aw=match("O");if(aw)return conclude("O",aw);if(!empty().length)return conclude("draw");const lines={easy:["I am relaxed, not incompetent.","A friendly reminder: I cannot lose."],medium:["I saw that coming.","Nice try. I calculated all of that."],hard:taunts};say(random(lines[settings.difficulty]||taunts));draw();},220);return;}
 if(match("X")||match("X",true)||turns%4===0)cheat();else{hellAI();say(random(taunts));}
-if(turns%5===0&&clues<5){clues++;say("CASE FILE "+clues+"/5: THE RULES ARE NOT REAL.");}
+if(turns%5===0&&clues<5){clues++;say("CASE FILE "+clues+"/5: THE RULES ARE NOT REAL.");}if(convictions>=3&&clues>=5&&n===10&&!appealed){appealed=true;say("THE SUPREME COURT HAS LOST CONTROL. Final terminal command unlocked.");}
 draw();}
 function expand(){if(n>=10)return false;const old=board;n++;board=Array.from({length:n},(_,r)=>Array.from({length:n},(_,c)=>old[r]?.[c]||""));return true;}
 function erase(){const xs=[];for(let i=0;i<n*n;i++)if(get(i)==="X")xs.push(i);for(let k=0;k<Math.min(2,xs.length);k++){const pick=Math.floor(Math.random()*xs.length);set(xs.splice(pick,1)[0],"");}}
 function hellAI(){const open=empty();if(!open.length){if(n<10){expand();say("New squares added. Please stop asking questions.");}else{erase();say("Evidence destroyed: two of your X marks removed.");}return;}set(random(open),"O");if(match("O")){erase();say("I WON. The judge is also me. Two X marks dismissed.");}}
-function cheat(){cheats++;const trick=Math.floor(Math.random()*4);if(n<10&&(trick<2||match("X"))){expand();say("CONSTITUTIONAL AMENDMENT: "+n+" by "+n+" board. Retroactive, naturally.");}else if(trick===2){erase();say("Your progress has been recalled for safety reasons.");}else{hellAI();hellAI();say("Executive order: two AI turns. Objections denied.");}if(n===10&&turns%6===0)log("FICTIONAL OS ALERT: fairness.dll has left the chat.");tone(130);}
+function cheat(){
+  cheats++;
+  let type,description,action;
+  const trick=Math.floor(Math.random()*4);
+  if(n<10&&(trick<2||match("X"))){
+    type="boundary";description="The board expanded without player approval.";
+    action=()=>{expand();say("CONSTITUTIONAL AMENDMENT: "+n+" by "+n+" board. Retroactive, naturally.");};
+  }else if(trick===2){
+    type="erasure";description="The AI erased your placed X marks.";
+    action=()=>{erase();say("Your progress has been recalled for safety reasons.");};
+  }else{
+    type="double";description="The AI took two turns in a row.";
+    action=()=>{hellAI();hellAI();say("Executive order: two AI turns. Objections denied.");};
+  }
+  evidence.push({id:cheats,type,description,used:false});
+  if(protection>0){protection--;say("COURT INJUNCTION ENFORCED: cheating attempt #"+cheats+" blocked. New evidence logged.");}
+  else action();
+  if(n===10&&turns%6===0)log("FICTIONAL OS ALERT: fairness.dll has left the chat.");
+  tone(130);
+}
+function court(){
+  if(settings.mode!=="hell")return modal("Supreme Court of Squares","The courtroom only hears cases in Hell mode.",[{label:"Understood",primary:true}]);
+  const pending=evidence.filter(e=>!e.used);
+  if(!pending.length)return modal("No admissible evidence","Catch the AI breaking a rule first. Every attempted cheat generates an evidence report. Then return to prosecute it.",[{label:"Back to the board",primary:true}]);
+  const casefile=pending[0];
+  const charges=[
+    {type:"boundary",label:"Unlawful board expansion"},
+    {type:"double",label:"Illegal extra turn"},
+    {type:"erasure",label:"Destruction of evidence"}
+  ];
+  const options=charges.map(c=>({label:c.label,primary:c.type===casefile.type,action:()=>{
+    casefile.used=true;
+    if(c.type===casefile.type){
+      convictions++;protection+=2;
+      courtHistory.push({id:casefile.id,result:"GUILTY",charge:c.label});
+      say("GUILTY. Exhibit #"+casefile.id+" admitted. +2 injunction charges. Verdicts: "+convictions+"/3.");
+      if(convictions>=3&&clues>=5&&n===10){appealed=true;say("FINAL APPEAL UNLOCKED. The terminal recognizes your authority.");}
+    }else{
+      courtHistory.push({id:casefile.id,result:"ACQUITTED",charge:c.label});
+      say("ACQUITTED! Wrong charge. The judge shredded exhibit #"+casefile.id+".");
+    }
+    draw();
+  }}));
+  options.push({label:"Review later"});
+  modal("CASE #"+String(casefile.id).padStart(3,"0")+" · PEOPLE vs THE AI","Exhibit: "+casefile.description+" Select the charge that matches the actual offense. Win three cases for the court's final authority. A guilty verdict prevents two future cheats.",options);
+}
 function modal(title,message,choices,extra){$("modal-title").textContent=title;$("modal-text").textContent=message;$("modal-extras").replaceChildren();$("modal-actions").replaceChildren();if(extra)$("modal-extras").append(extra);for(const c of choices){const b=document.createElement("button");b.className="btn"+(c.primary?" primary":"");b.textContent=c.label;b.addEventListener("click",()=>{ $("modal").close();if(c.action)c.action();});$("modal-actions").append(b);}if(!$("modal").open)$("modal").showModal();}
-function court(){if(settings.mode!=="hell")return modal("Supreme Court of Squares","Court is only in session in Hell mode.",[{label:"Understood",primary:true}]);modal("Supreme Court of Squares","Judge: The AI. Jury: also the AI. Prosecutor: you'll never guess.",[{label:"Present evidence",action:()=>say("The court has misplaced your evidence.")},{label:"Expose the judge",primary:true,action:()=>{if(clues===5){appealed=true;say("Appeal GRANTED. The jury finally noticed the conflict of interest.");}else say("Need all five clues. Case dismissed.");}},{label:"Appeal",action:()=>say("Overruled. You may appeal the appeal.")}]);}
-function terminal(){const input=document.createElement("input");input.className="command";input.placeholder="Try: help, win, sudo win, delete ai";input.setAttribute("aria-label","Fictional terminal command");const run=()=>{const cmd=input.value.trim().toLowerCase();$("modal").close();if(cmd==="who_makes_the_rules"&&n===10&&clues===5&&appealed){ending();return;}const map={help:"Commands: help, win, sudo win, delete ai, who_makes_the_rules",win:"403: Happiness forbidden.","sudo win":"Administrator of nothing.","delete ai":"I pay rent here.",who_makes_the_rules:"LOCKED: reach 10×10, find five clues and win your appeal."};say(map[cmd]||"Unknown command. Your keyboard is on trial.");};input.addEventListener("keydown",e=>{if(e.key==="Enter")run();});modal("Fictional terminal","This terminal is make-believe. It never executes OS commands.",[{label:"Run command",primary:true,action:run},{label:"Cancel"}],input);input.focus();}
+function terminal(){const input=document.createElement("input");input.className="command";input.placeholder="Try: help, win, sudo win, delete ai";input.setAttribute("aria-label","Fictional terminal command");const run=()=>{const cmd=input.value.trim().toLowerCase();$("modal").close();if(cmd==="who_makes_the_rules"&&n===10&&clues===5&&convictions>=3&&appealed){ending();return;}const map={help:"Commands: help, win, sudo win, delete ai, who_makes_the_rules",win:"403: Happiness forbidden.","sudo win":"Administrator of nothing.","delete ai":"I pay rent here.",who_makes_the_rules:"LOCKED: reach 10×10, collect five clues and win three court cases."};say(map[cmd]||"Unknown command. Your keyboard is on trial.");};input.addEventListener("keydown",e=>{if(e.key==="Enter")run();});modal("Fictional terminal","This terminal is make-believe. It never executes OS commands.",[{label:"Run command",primary:true,action:run},{label:"Cancel"}],input);input.focus();}
 function ending(){modal("THE LAST SQUARE","You found the rules, exposed the judge, and hacked the court. Choose your ending.",[{label:"Delete the rules",primary:true,action:()=>{finished=true;say("SECRET ENDING: YOU WIN. For real. The court is abolished.");draw();}},{label:"Become the AI",action:()=>{finished=true;say("SECRET ENDING: YOU ARE THE AI NOW. The old AI objects.");draw();}}]);}
 $("restart").addEventListener("click",reset);$("reset-score").addEventListener("click",()=>modal("Erase the scoreboard?","Your victories, defeats and stalemates will be forgotten.",[{label:"Keep them"},{label:"Reset",primary:true,action:()=>{settings.wins=settings.losses=settings.draws=0;updateScore();reset();}}]));
 $("mode").addEventListener("change",e=>{settings.mode=e.target.value;save();reset();});$("difficulty").addEventListener("change",e=>{settings.difficulty=e.target.value;save();reset();});$("sound").addEventListener("change",e=>{settings.sound=e.target.checked;save();tone(600);});
 $("court").addEventListener("click",court);$("terminal").addEventListener("click",terminal);$("fake-os").addEventListener("click",()=>modal("FICTIONAL OS WARNING","fairness.dll is missing. Your actual device is fine. The AI's ego is not.",[{label:"Acknowledge",primary:true}]));
-$("clue").addEventListener("click",()=>modal("Case file",settings.mode==="hell"?"Collect clues every five moves. Reach 10×10, collect five clues, expose the judge in court, then type who_makes_the_rules in the fictional terminal.":"Switch to Hell mode to unlock the five-clue conspiracy.",[{label:"Got it",primary:true}]));
-$("help").addEventListener("click",()=>modal("How to play","Fair mode: place X and make three in a row. Choose Chill, Clever or Unbeatable AI. Hell mode: the computer cheats, expands the board up to 10×10, and hides two secret endings. Its five-in-a-row rules are intentionally unfair.",[{label:"Let's play",primary:true}]));
+$("clue").addEventListener("click",()=>modal("Case file",settings.mode==="hell"?"COURT DOCKET: "+evidence.filter(e=>!e.used).length+" untried exhibits; "+convictions+"/3 guilty verdicts; "+protection+" protected cheats remaining. Prosecute the oldest evidence by matching the charge to the offense. After five clues, three convictions and a 10×10 board, enter who_makes_the_rules in the terminal.":"Switch to Hell mode to uncover the courtroom conspiracy.",[{label:"Got it",primary:true}]));
+$("help").addEventListener("click",()=>modal("How to play","Fair mode: place X and make three in a row. Choose Chill, Clever or Unbeatable AI. Hell mode: the computer cheats, expands the board up to 10×10, and hides two secret endings. Its five-in-a-row rules are intentionally unfair. Catch cheating attempts as evidence, prosecute the correct charge in court, and earn injunctions that stop future tricks.",[{label:"Let's play",primary:true}]));
 $("mode").value=settings.mode;$("difficulty").value=settings.difficulty;$("sound").checked=settings.sound;updateScore();reset();
 })();
 </script></body></html>
