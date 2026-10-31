@@ -117,3 +117,11 @@ body:not(.court-active),.shell>header,.layout>.arena,.layout>.side,.board.board-
 .cell,.board,.status,.btn,.story-actions button,.field select,.arena:before,.settings:before,.chronicle:before{transition:none!important}
 .court-spot{display:none!important}
 }
+
+
+/* Animate only genuinely new marks, never replay every occupied cell on redraw. */
+.cell.x,.cell.o{animation:none}
+.cell.fresh.x,.cell.fresh.o{animation:hellMark .34s cubic-bezier(.14,1.6,.3,1) both}
+@media(prefers-reduced-motion:reduce){.cell.fresh.x,.cell.fresh.o{animation:none!important}}
+/* Keep trial title cards within short laptop screens as well as phones. */
+@media(max-height:700px){.court-spot .spot-inner{padding:16px 20px}.court-spot strong{font-size:clamp(1.65rem,5vw,4.1rem)}.court-spot small{font-size:.74rem}.court-wrap{gap:9px}.court-stage{min-height:240px}.court-face{height:145px}}
