@@ -170,3 +170,7 @@ The AI's first three-in-a-row now credits a machine point during the normal 3×3
 ## Consistent score rule (October 31, 2026)
 
 A line of **three consecutive Xs or Os** scores on every board size, including expanded 5×5 through 10×10 boards. The prior five-in-a-row threshold after expansion was inconsistent with the opening rules and has been removed. Threat detection, human-win triggers and the AI's scoring use the same three-in-a-row target. Each completed three-cell line is credited at most once per round. Stolen marks from the initial corruption reveal cannot generate unearned machine points.
+
+## Victory feedback upgrade
+
+Legitimate three-in-a-row scoring now triggers a highlighted winning line and a brief full-screen celebration. The machine celebrates its own scoring in pink, while the human gets a cyan victory sequence (and Hell-mode retaliation continues afterward). Fair mode also uses these win effects. New completed machine lines are credited once, and marks converted by the initial reveal remain ineligible for unearned points. A round reset cancels and removes the previous cutscene. Animations respect reduced-motion settings.
