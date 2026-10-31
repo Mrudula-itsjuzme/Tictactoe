@@ -19,12 +19,25 @@ button,select,input{font:inherit}button{cursor:pointer}button:focus-visible,sele
 </style>
 <link rel="stylesheet" href="court-drama.css">
 <link rel="stylesheet" href="arcade.css">
+<link rel="stylesheet" href="two-screen.css">
 </head>
-<body><div class="shell arcade-shell">
+<body>
+<section class="game-intro" id="game-intro" aria-labelledby="intro-heading">
+ <div class="intro-inner">
+  <div class="intro-crest">THE UNFAIR GAME EXPERIMENT · VOL. 001</div>
+  <div class="intro-xo" aria-hidden="true">X<span>O</span></div>
+  <h1 class="intro-title" id="intro-heading">TIC TAC <span>HELL.</span></h1>
+  <p class="intro-tagline">Every move has consequences. Every rule has an exception.</p>
+  <button class="intro-play" type="button" id="enter-game">▶ ENTER THE GAME</button>
+  <div class="intro-footer">PRESS ENTER TO CHALLENGE THE MACHINE · NO ESCAPE CLAUSE</div>
+ </div>
+</section>
+<div class="intro-shutter" id="intro-shutter" aria-hidden="true"></div>
+<div class="shell arcade-shell" id="game-shell" inert>
 <header class="arcade-header">
  <div class="brand-mark" aria-hidden="true"><span>✕</span><span>○</span></div>
  <div class="brand-copy"><div class="eyebrow">UNFAIR GAMES STUDIOS / EXPERIMENT 001</div><h1>TIC TAC <span>HELL<span class="title-dot">.</span></span></h1><p class="subtitle">The board is rigged. The courtroom is worse.</p></div>
- <div class="header-stamp"><span class="stamp-pulse"></span> THE SYSTEM IS WATCHING <small>EST. 6.66</small></div>
+ <button class="game-home" id="game-home" type="button" aria-label="Return to title screen">← TITLE SCREEN</button>
 </header>
 <div class="marquee-line" aria-hidden="true"><span>NO FAIR PLAY GUARANTEED</span><b>✦</b><span>YOUR MOVE IS EVIDENCE</span><b>✦</b><span>THE MACHINE NEVER FORGETS</span><b>✦</b><span>NO FAIR PLAY GUARANTEED</span></div>
 <main class="layout arcade-layout">
@@ -154,6 +167,30 @@ $("mode").addEventListener("change",e=>{settings.mode=e.target.value;save();rese
 $("court").addEventListener("click",court);$("terminal").addEventListener("click",terminal);$("fake-os").addEventListener("click",()=>modal("FICTIONAL OS WARNING","fairness.dll is missing. Your actual device is fine. The AI's ego is not.",[{label:"Acknowledge",primary:true}]));
 $("clue").addEventListener("click",()=>modal("Case file",settings.mode==="hell"?"UNSEALED CASE DOSSIER: "+evidence.filter(e=>!e.used).length+" pending exhibits. "+courtHistory.length+" verdicts. "+clues+" intercepted transcripts. "+(clues>=3?"Transcript fragment: WHO MAKES THE RULES?":"The court is hiding a command behind its verdicts."):"The case dossier remains sealed.",[{label:"Got it",primary:true}]));
 
-$("mode").value=settings.mode;$("difficulty").value=settings.difficulty;$("sound").checked=settings.sound;updateScore();reset();
+// Presentation state is isolated from the game: returning to the title never resets a round.
+const intro=$("game-intro"),shell=$("game-shell"),shutter=$("intro-shutter"),play=$("enter-game");
+let transitioning=false;
+const reduced=()=>window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+function enterGame(){
+ if(transitioning||intro.hidden)return;
+ transitioning=true;
+ intro.classList.add("intro-leaving");
+ shell.inert=false;
+ if(!reduced()){shutter.classList.remove("run");void shutter.offsetWidth;shutter.classList.add("run");}
+ window.setTimeout(()=>{
+  intro.hidden=true;intro.classList.remove("intro-leaving");
+  shutter.classList.remove("run");transitioning=false;
+  $("board").querySelector("button:not(:disabled)")?.focus() || $("restart").focus();
+ },reduced()?0:800);
+}
+function returnToTitle(){
+ if(transitioning)return;
+ intro.hidden=false;intro.classList.remove("intro-leaving");
+ shell.inert=true;play.focus();
+}
+play.addEventListener("click",enterGame);
+$("game-home").addEventListener("click",returnToTitle);
+intro.addEventListener("keydown",e=>{if(e.key==="Enter"&&e.target!==play){e.preventDefault();enterGame();}});
+$("mode").value=settings.mode;$("difficulty").value=settings.difficulty;$("sound").checked=settings.sound;updateScore();reset();play.focus();
 })();
 </script></body></html>
