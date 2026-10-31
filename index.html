@@ -80,7 +80,7 @@ const taunts=["Your confidence is statistically concerning.","My lawyer approved
 const defaults={wins:0,losses:0,draws:0,sound:false,mode:"fair",difficulty:"hard"};
 let settings={...defaults};
 try{const value=JSON.parse(localStorage.getItem("tic-tac-hell-v2")||"{}");for(const k of Object.keys(defaults))if(typeof value[k]===typeof defaults[k])settings[k]=value[k];}catch{}
-let board=[],n=3,turns=0,roundHumanPoints=0,roundMachinePoints=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[],awardedLines=new Set(),awardedMachineLines=new Set(),stolenSquares=new Set(),tantrumCount=0,pendingErasure=false,corruptionRevealed=false,celebrationTimer=null,previousMarks=new Map(),previousSize=3,previousScores={wins:settings.wins,losses:settings.losses,draws:settings.draws};
+let board=[],n=3,turns=0,roundHumanPoints=0,roundMachinePoints=0,phantomScore=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[],awardedLines=new Set(),awardedMachineLines=new Set(),stolenSquares=new Set(),tantrumCount=0,pendingErasure=false,corruptionRevealed=false,celebrationTimer=null,previousMarks=new Map(),previousSize=3,previousScores={wins:settings.wins,losses:settings.losses,draws:settings.draws};
 const save=()=>{try{localStorage.setItem("tic-tac-hell-v2",JSON.stringify(settings));}catch{}};
 const random=a=>a[Math.floor(Math.random()*a.length)];
 const empty=()=>board.flatMap((row,r)=>row.map((v,c)=>v?"":r*n+c)).filter(v=>v!=="");
@@ -91,10 +91,10 @@ function log(message){const p=document.createElement("p");p.textContent=message;
 function animateOnce(element,cls){if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;element.classList.remove(cls);void element.offsetWidth;element.classList.add(cls);element.addEventListener("animationend",()=>element.classList.remove(cls),{once:true});}
 function say(message){$("status").textContent=message;animateOnce($("status"),"status-pulse");log(message);}
 function updateScore(){["wins","losses","draws"].forEach(k=>{const old=previousScores[k];$(k).textContent=settings[k];if(old!==settings[k]){animateOnce($(k).closest(".stat"),"stat-ping");previousScores[k]=settings[k];}});save();}
-function reset(){session++;n=3;roundHumanPoints=0;roundMachinePoints=0;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];awardedLines.clear();awardedMachineLines.clear();stolenSquares.clear();tantrumCount=0;pendingErasure=false;corruptionRevealed=false;document.querySelector(".tantrum-overlay")?.remove();document.querySelector(".victory-cutscene")?.remove();clearTimeout(celebrationTimer);previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Your move. Three in a row wins.");draw();}
+function reset(){session++;n=3;roundHumanPoints=0;roundMachinePoints=0;phantomScore=0;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];awardedLines.clear();awardedMachineLines.clear();stolenSquares.clear();tantrumCount=0;pendingErasure=false;corruptionRevealed=false;document.querySelector(".tantrum-overlay")?.remove();document.querySelector(".victory-cutscene")?.remove();clearTimeout(celebrationTimer);previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Your move. Three in a row wins.");draw();}
 function lines(k){const arr=[],d=[[1,0],[0,1],[1,1],[1,-1]];for(let r=0;r<n;r++)for(let c=0;c<n;c++)for(const [dr,dc] of d){const e=[];for(let j=0;j<k;j++){const y=r+j*dr,x=c+j*dc;if(y<0||x<0||y>=n||x>=n)break;e.push(y*n+x);}if(e.length===k)arr.push(e);}return arr;}
 function match(who,oneAway=false){for(const line of lines(3)){const values=line.map(get);if(oneAway?values.filter(v=>v===who).length===line.length-1&&values.includes(""):values.every(v=>v===who))return line;}return null;}
-function draw(){const el=$("board");const grew=n!==previousSize;const nextMarks=new Map();if(grew)animateOnce(el,"board-impact");previousSize=n;el.replaceChildren();el.style.gridTemplateColumns="repeat("+n+",minmax(0,1fr))";el.style.gridTemplateRows="repeat("+n+",minmax(0,1fr))";el.classList.toggle("big",n>3);$("board-size").textContent=n+" × "+n+" BOARD";$("mode-label").textContent=settings.mode==="fair"?"FAIR PLAY":corruptionRevealed?"CHAOS PROTOCOL ACTIVE":"STANDARD MATCH";$("round-label").textContent=finished?"Round complete.":thinking?"The AI is plotting.":"Your move, troublemaker.";$("difficulty").disabled=settings.mode==="hell";const clueText="Evidence: "+evidence.length+" · Guilty verdicts: "+convictions+"/3 · Clues: "+clues+"/5 · Shield: "+protection;if($("clue-count").textContent!==clueText){$("clue-count").textContent=clueText;animateOnce($("clue-count"),"clue-ping");}for(let i=0;i<n*n;i++){const b=document.createElement("button"),v=get(i);b.type="button";const key=Math.floor(i/n)+":"+(i%n);b.className="cell"+(v?" "+v.toLowerCase():"")+(v&&previousMarks.get(key)!==v?" fresh":"")+(winning.includes(i)?" win":"");if(v)nextMarks.set(key,v);b.textContent=v;b.setAttribute("aria-label","Row "+(Math.floor(i/n)+1)+", column "+(i%n+1)+(v?", "+v:" empty"));b.disabled=finished||thinking||!!v;b.addEventListener("click",()=>move(i));el.append(b);}previousMarks=nextMarks;}
+function draw(){const el=$("board");const grew=n!==previousSize;const nextMarks=new Map();if(grew)animateOnce(el,"board-impact");previousSize=n;el.replaceChildren();el.style.gridTemplateColumns="repeat("+n+",minmax(0,1fr))";el.style.gridTemplateRows="repeat("+n+",minmax(0,1fr))";el.classList.toggle("big",n>3);$("board-size").textContent=n+" × "+n+" BOARD";$("mode-label").textContent=settings.mode==="fair"?"FAIR PLAY":corruptionRevealed?"CHAOS PROTOCOL ACTIVE":"STANDARD MATCH";$("round-label").textContent=finished?"Round complete.":thinking?"The AI is plotting.":"Your move, troublemaker.";$("difficulty").disabled=settings.mode==="hell";const clueText="Reality breach: +"+phantomScore+" fake AI points · Evidence: "+evidence.length+" · Guilty verdicts: "+convictions+"/3 · Clues: "+clues+"/5 · Shield: "+protection;if($("clue-count").textContent!==clueText){$("clue-count").textContent=clueText;animateOnce($("clue-count"),"clue-ping");}for(let i=0;i<n*n;i++){const b=document.createElement("button"),v=get(i);b.type="button";const key=Math.floor(i/n)+":"+(i%n);b.className="cell"+(v?" "+v.toLowerCase():"")+(v&&previousMarks.get(key)!==v?" fresh":"")+(winning.includes(i)?" win":"");if(v)nextMarks.set(key,v);b.textContent=v;b.setAttribute("aria-label","Row "+(Math.floor(i/n)+1)+", column "+(i%n+1)+(v?", "+v:" empty"));b.disabled=finished||thinking||!!v;b.addEventListener("click",()=>move(i));el.append(b);}previousMarks=nextMarks;}
 function celebrate(who,linesWon,{fair=false}={}){
  const machine=who==="O";
  const boardEl=$("board");
@@ -152,7 +152,7 @@ setTimeout(()=>{
       if(stamp!==session)return;
       const old=n;
       if(n<10)expand();
-      evidence.push({id:++cheats,type:"erasure",description:"The machine converted the player's X marks into its own O marks during an emergency review.",used:false});
+      evidence.push({id:++cheats,type:"erasure",description:"The machine converted the player's X marks into its own O marks during an emergency review.",used:false,annotation:"",customTitle:"",authenticity:100,defense:null});
       say("The machine has seized your marks. Exhibit #"+cheats+" has been recorded.");
       if(old!==n)log("NOTICE: BOARD DIMENSIONS ALTERED WITHOUT PLAYER CONSENT.");
       finishHellTurn();
@@ -301,7 +301,9 @@ function cheat(emergency=false,lastMove=null){
     type="double";description="The AI took two turns in a row.";
     action=()=>{hellAI();hellAI();say("EXECUTIVE ORDER: TWO AI TURNS. NO APPEALS.");};
   }
-  evidence.push({id:cheats,type,description,used:false});
+  phantomScore+=2+Math.min(33,n*3)+Math.floor(cheats/2);
+  evidence.push({id:cheats,type,description,used:false,annotation:"",customTitle:"",authenticity:100,defense:null});
+  say("FICTIONAL SCOREBOARD HIJACK: +"+phantomScore+" FAKE POINTS. Real scores unchanged.");
   if(mustGrow){action();if(protection>0)say("The court claims board expansion is exempt from injunctions.");}
   else if(protection>0){protection--;say("INJUNCTION ENFORCED: attempted cheat #"+cheats+" blocked. Evidence preserved.");}
   else action();
@@ -323,11 +325,11 @@ function court(){
     exhibit.used=true;
     if(guilty){
       convictions++;protection+=2;
-      courtHistory.push({id:exhibit.id,result:"GUILTY",credibility:details.credibility});
+      courtHistory.push({id:exhibit.id,result:"GUILTY",credibility:details.credibility,jury:details.jury,reason:details.reason});
       say("CASE #"+exhibit.id+": GUILTY. Two anti-cheat injunctions awarded. "+convictions+"/3 convictions.");
       if(convictions>=3&&clues>=5&&n===10){appealed=true;say("FINAL APPEAL UNLOCKED. The terminal recognizes your authority.");}
     }else{
-      courtHistory.push({id:exhibit.id,result:"ACQUITTED",credibility:details.credibility});
+      courtHistory.push({id:exhibit.id,result:"ACQUITTED",credibility:details.credibility,jury:details.jury,reason:details.reason});
       say("CASE #"+exhibit.id+": ACQUITTED. The court has destroyed this exhibit.");
     }
     draw();
