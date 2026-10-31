@@ -71,9 +71,9 @@ determineJury(){
  const quality=(this.ok1?17:-9)+(this.ok2?21:-16)+(this.ok3?22:-13)+(this.battleWon?12:-14)+Math.round((exhibit.authenticity??100)*.09)-this.defenseStrength;
  const persuasion=quality+this.cred*.25-this.bias*.29;
  this.juryVotes=Array.from({length:9},(_,i)=>{
-  const temperament=[-23,-16,-11,-5,1,6,12,18,25][(i+exhibit.id)%9];
+  const temperament=[-62,-45,-31,-14,-3,10,22,34,48][(i+exhibit.id)%9];
   const deterministicDoubt=((exhibit.id*13+i*7+this.level*3)%11)-5;
-  return persuasion+temperament+deterministicDoubt>=24;
+  return persuasion+temperament+deterministicDoubt>=66;
  });
  return this.juryVotes.filter(Boolean).length>=5;
 }
