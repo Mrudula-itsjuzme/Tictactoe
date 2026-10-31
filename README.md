@@ -39,23 +39,13 @@ The Java edition requires Java 11 or newer, a graphical desktop, and is **not** 
 
 **All three personalities use perfect-play minimax with alpha-beta pruning.** They differ in attitude, never in playing strength. The human can at best draw when playing perfectly.
 
-The AI moves second. It never overwrites occupied squares in fair mode. Hell mode is **deliberately unfair** and does not promise the normal win conditions. Each cheating attempt produces a recorded exhibit. Prosecuting an exhibit requires selecting the correct charge; each guilty verdict awards two single-use protective injunctions. Three guilty verdicts, five clues, and the 10×10 board unlock the final terminal ending.
+The AI moves second. It never overwrites occupied squares in fair mode. Hell mode is **deliberately unfair** and does not promise the normal win conditions. Hell mode escalates through deterministic chapters, and every cheating attempt produces a recorded exhibit. Prosecuting an exhibit requires selecting the correct charge; each guilty verdict awards two single-use protective injunctions. Three guilty verdicts, five clues, and the 10×10 board unlock the final terminal ending.
 
-## Hidden story and endings
+## Hidden story
 
-Hell mode contains five collectible clues, an evidence-based courtroom, a fictional terminal, and two endings.
+Hell mode contains sealed transcripts, an evidence-based courtroom, a fictional terminal, and two endings. The website intentionally avoids a tutorial or a complete solution. Explore the incident log and case dossier to discover what the machine is hiding.
 
-<details>
-<summary>Show spoiler: how to unlock the endings</summary>
 
-1. Play Hell mode until the board expands to 10×10.
-2. Collect all five clues, one for each five player moves.
-3. Catch the AI cheating, then open **Courtroom**. This launches a cinematic full-screen trial with Judge Gridlock, Defense Counsel O.S., and the nine-square jury. Identify the correct charge, present matching board-state evidence, then cross-examine the defense with the correct contradiction. All three stages must succeed to earn a **guilty** verdict. Win **three cases**. Each guilty verdict grants two injunction charges that block future cheating attempts.
-4. Open **Terminal** and enter `who_makes_the_rules`.
-5. Choose **Delete the rules** or **Become the AI**.
-
-All terminal commands and operating-system alerts are **fictional in-game interactions**. The browser app doesn't invoke shell commands or change device settings.
-</details>
 
 ## Experience
 
@@ -117,3 +107,7 @@ Animation respects the user's reduced-motion preference. Sound effects are synth
 The 2026 cinematic polish pass extends animations beyond the courtroom: new player and AI marks receive distinct pop-in effects, new board dimensions and blocked cheats trigger board reactions, updated scores pulse, status messages and incident-log entries animate, the settings and story controls respond to interaction, and dialog windows animate into view. The courtroom's full-screen cut-in typography now wraps and scales within narrow and short viewports rather than overflowing the screen. Repeated board redraws do not reanimate old marks.
 
 Animations are CSS/JavaScript-driven, with no external video assets or animation dependencies. Reduced-motion settings disable nonessential effects. All existing gameplay logic and the original Java desktop edition remain intact.
+
+## 2026-10-31 gameplay revisions
+
+The public help walkthrough was removed to preserve discovery. Hell-mode board expansion is scheduled through the cheat progression instead of left entirely to chance; its AI prioritizes blocking immediate threats. The story releases sealed transcripts more quickly and gives increasingly cryptic hints through the case dossier and terminal. Court sanctions, evidence trials and the two endings are preserved. Fair mode retains non-losing minimax AI across all three personalities.
