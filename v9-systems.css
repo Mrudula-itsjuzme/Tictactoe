@@ -1,0 +1,36 @@
+/* V9: modern control desk, interactive casework, and juror voting. */
+#modal:has(.ops-workspace),#modal:has(.dossier-workspace){width:min(1060px,94vw);max-width:94vw;max-height:90dvh;background:#0e1020;border:1px solid #4b5778;border-radius:18px;box-shadow:0 28px 90px #000b,0 0 40px #8056d926;color:#f7f4ff;padding:clamp(14px,2.5vw,28px);overflow:auto}
+#modal:has(.ops-workspace) #modal-title,#modal:has(.dossier-workspace) #modal-title{font:900 clamp(1.35rem,2.3vw,2rem)/1.15 system-ui;letter-spacing:-.035em;color:#fff}
+#modal:has(.ops-workspace) #modal-text,#modal:has(.dossier-workspace) #modal-text{color:#a5adc9;font:700 .72rem/1.5 system-ui;letter-spacing:.1em}
+.ops-workspace{display:grid;grid-template-columns:minmax(145px,.32fr) minmax(0,1fr);gap:14px;min-height:360px;margin:12px 0;font-family:system-ui}
+.ops-nav{display:flex;flex-direction:column;gap:7px;padding:9px;border:1px solid #303854;background:#14192b;border-radius:13px}
+.ops-nav button{padding:13px 12px;text-align:left;border:1px solid transparent;border-radius:9px;background:transparent;color:#a6b1ce;font:800 .79rem system-ui;cursor:pointer}
+.ops-nav button:hover,.ops-nav button.active{color:#e5fef9;border-color:#2e947c;background:#164135}
+.ops-view{display:flex;flex-direction:column;min-width:0;padding:17px;border-radius:13px;background:radial-gradient(ellipse at 70% 0,#27374a,#0b1523 75%);border:1px solid #31475b}
+.ops-view h3{font:900 .85rem system-ui;color:#67f5d2;letter-spacing:.13em;margin:0 0 13px}
+.ops-result{flex:1;min-height:230px;max-height:44dvh;margin:0;white-space:pre-wrap;overflow:auto;overflow-wrap:anywhere;color:#d0f3eb;font: .81rem/1.8 ui-monospace,SFMono-Regular,Consolas,monospace}
+.ops-command{display:flex;gap:9px;padding-top:12px;border-top:1px solid #365269}
+.ops-command input{min-width:0;flex:1;padding:11px 12px;border-radius:8px;border:1px solid #507d83;color:#d9ffef;background:#101c29;font: .78rem ui-monospace,monospace}
+.ops-command button,.file-save,.dossier-toolbar button{background:#55e7bb;color:#08211c;border:0;border-radius:8px;padding:10px 14px;font:900 .72rem system-ui;cursor:pointer}
+.dossier-workspace{margin:15px 0;display:grid;grid-template-columns:minmax(170px,.4fr) minmax(0,1fr);grid-template-rows:auto minmax(280px,1fr);gap:12px;max-height:62dvh;min-height:300px}
+.dossier-toolbar{grid-column:1/-1;display:flex;justify-content:space-between;gap:12px;align-items:center;padding:11px;border:1px solid #48445e;background:#1a1a2c;border-radius:9px}
+.dossier-toolbar>span{font:800 .75rem system-ui;color:#c7bad5}
+.dossier-list{min-height:0;overflow:auto;display:flex;flex-direction:column;gap:7px;padding:10px;background:#12182a;border:1px solid #37405c;border-radius:10px}
+.evidence-file{border:1px solid #47465c;background:#232136;color:#d7cbe8;text-align:left;padding:13px 10px;cursor:pointer;font:800 .7rem/1.5 system-ui;border-radius:7px;overflow-wrap:anywhere}
+.evidence-file:hover,.evidence-file.active{background:#5c2a51;color:#fff;border-color:#f48bb0}
+.dossier-editor{min-width:0;overflow:auto;display:flex;flex-direction:column;gap:10px;padding:17px;background:#1a1b30;border:1px solid #42425f;border-radius:10px}
+.dossier-editor h3{font:900 clamp(1.1rem,2vw,1.5rem) system-ui;color:#ffe2b2;margin:0}
+.file-provenance{font:800 .68rem/1.5 ui-monospace,monospace;color:#b7d6cf;letter-spacing:.04em}
+.dossier-field{display:flex;flex-direction:column;gap:6px}
+.dossier-field>span{font:800 .65rem system-ui;color:#c5afcf;letter-spacing:.1em}
+.dossier-field input,.dossier-field textarea,.dossier-field select{width:100%;box-sizing:border-box;border:1px solid #5c5475;border-radius:7px;background:#0f1426;color:#f8f4ff;padding:11px;font: .82rem/1.45 system-ui;resize:vertical}
+.dossier-editor .file-save{align-self:flex-start;background:#ff7a9d;color:#280a1b}
+.file-defense{padding:12px;border-left:3px solid #ff759f;background:#361a37;color:#ffccda;font:700 .77rem/1.5 system-ui}
+.court-jury .juror-guilty{color:#9fffe4;border-color:#66efd2;background:#134539}
+.court-jury .juror-acquit{color:#ffd4de;border-color:#ff83ad;background:#572342}
+.theatre[data-act="verdict"] .court-jury span{font-size:1rem;font-weight:900;animation:voteFlip .45s cubic-bezier(.2,1.3,.3,1) both}
+@keyframes voteFlip{from{transform:rotateY(90deg) scale(.5)}to{transform:rotateY(0) scale(1)}}
+.theatre[data-act="verdict"] .court-jury span:nth-child(2n){animation-delay:.08s}
+.theatre[data-act="verdict"] .court-jury span:nth-child(3n){animation-delay:.17s}
+@media(max-width:700px){.ops-workspace{grid-template-columns:1fr;min-height:340px}.ops-nav{flex-direction:row;flex-wrap:wrap;gap:3px}.ops-nav button{padding:8px;font-size:.64rem}.ops-view{min-height:270px;padding:10px}.ops-result{min-height:180px}.dossier-workspace{grid-template-columns:1fr;grid-template-rows:auto minmax(80px,auto) minmax(270px,1fr);max-height:70dvh}.dossier-list{max-height:105px}.dossier-editor{padding:12px}.dossier-toolbar>span{font-size:.62rem}}
+@media(prefers-reduced-motion:reduce){.theatre[data-act="verdict"] .court-jury span{animation:none!important}}
