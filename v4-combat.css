@@ -73,3 +73,15 @@ dialog.alert-scene{border:2px solid #ff566d;background:#360d22;box-shadow:0 0 75
 @keyframes dossierSlam{from{opacity:.4;transform:translateY(50px) rotate(-6deg) scale(.88)}to{opacity:1;transform:none}}
 @keyframes alertBoot{0%,35%,75%{filter:brightness(2);transform:translateX(-3px)}20%,55%,100%{filter:brightness(1);transform:none}}
 @media(prefers-reduced-motion:reduce){dialog.terminal-scene,dialog.dossier-scene,dialog.alert-scene{animation:none!important}}
+
+
+/* The mark lands, then the machine visibly destroys it. */
+.arcade-arena .cell.erasing{position:relative;z-index:5;pointer-events:none;animation:markErasure .55s cubic-bezier(.2,.8,.5,1) both!important}
+.arcade-arena .cell.erasing:after{content:"";position:absolute;inset:-5px;border:2px solid #ff477e;box-shadow:0 0 30px #ff3979, inset 0 0 26px #ff397955;animation:erasureRing .55s ease both;pointer-events:none}
+@keyframes markErasure{0%{opacity:1;transform:scale(1);filter:none}26%{transform:scale(1.18) skew(-7deg);filter:brightness(2) hue-rotate(110deg)}50%{transform:translateX(5px) skew(12deg);opacity:1}90%{transform:scale(.6) rotate(13deg);filter:blur(8px);opacity:.05}100%{opacity:0;transform:scale(.25)}}
+@keyframes erasureRing{0%{opacity:0;transform:scale(.6)}45%{opacity:1;transform:scale(1.09)}100%{opacity:0;transform:scale(1.4)}}
+.tantrum-overlay{position:fixed;inset:0;z-index:8000;pointer-events:none;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:18px;padding:24px;background:repeating-conic-gradient(from 0deg at 50% 50%,#ff518d35 0 5deg,transparent 5deg 17deg),radial-gradient(ellipse at center,#a20e43e8,#100512ee 75%);animation:tantrumEnter 1.55s ease both}
+.tantrum-overlay strong{font:italic 900 clamp(2.2rem,9vw,8rem)/.97 Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif;text-align:center;color:#ffe3a4;text-shadow:7px 8px #7c0e35;max-width:100%;overflow-wrap:anywhere}
+.tantrum-overlay span{font:900 clamp(.7rem,1.5vw,1rem) system-ui;letter-spacing:.16em;color:#93fff1;text-align:center}
+@keyframes tantrumEnter{0%{opacity:0;transform:scale(1.12)}15%,70%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.96)}}
+@media(prefers-reduced-motion:reduce){.arcade-arena .cell.erasing,.arcade-arena .cell.erasing:after,.tantrum-overlay{animation:none!important}.tantrum-overlay{opacity:1}}
