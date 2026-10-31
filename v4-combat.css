@@ -59,3 +59,17 @@
 @media(max-width:900px){.arcade-layout{grid-template-columns:1fr!important}.arcade-sidebar.tabbed-sidebar{min-height:320px;height:370px}.arcade-arena .board,.arcade-arena .board.big{width:min(100%,calc(78dvh - 208px),570px)!important}}
 @media(max-width:620px){.arcade-arena .board,.arcade-arena .board.big{width:min(100%,calc(85dvh - 215px),390px)!important}.duel-stage{padding:9px}.duel-head{font-size:.53rem}.duel-fighter .duel-figure{height:110px;width:70px}.duel-versus{font-size:2rem}}
 @media(prefers-reduced-motion:reduce){.arcade-arena .cell.fresh.x,.arcade-arena .cell.fresh.o,.arena-stage:after,.duel-stage:before,.duel-fighter .duel-figure,.duel-fighter.hit{animation:none!important}}
+
+
+/* Scene entrances: archive folders, CRT terminal, alarm alerts */
+dialog.terminal-scene{width:min(580px,92vw);border:1px solid #62efda;background:#071618;color:#aefbe8;box-shadow:0 0 65px #39ffe15a,0 0 0 100vmax #0007;animation:terminalBoot .48s steps(8,end)}
+dialog.terminal-scene h2{color:#83ffdb;font-family:ui-monospace,monospace;letter-spacing:.12em}
+dialog.terminal-scene p{color:#81cbb9;font-family:ui-monospace,monospace}
+dialog.terminal-scene .command{border-color:#4fffd6;color:#a9ffe5;background:#020b0c}
+dialog.dossier-scene{background:linear-gradient(135deg,#4b3022,#241627);border:3px double #ffd291;box-shadow:0 0 55px #f3c47566;animation:dossierSlam .4s cubic-bezier(.1,1.4,.25,1)}
+dialog.dossier-scene h2{font:900 1.9rem Georgia,serif;color:#ffe09f}
+dialog.alert-scene{border:2px solid #ff566d;background:#360d22;box-shadow:0 0 75px #f5366499;animation:alertBoot .26s ease}
+@keyframes terminalBoot{0%{clip-path:inset(48% 0 49% 0);opacity:.2}55%{clip-path:inset(20% 0 20% 0);opacity:1}100%{clip-path:inset(0)}}
+@keyframes dossierSlam{from{opacity:.4;transform:translateY(50px) rotate(-6deg) scale(.88)}to{opacity:1;transform:none}}
+@keyframes alertBoot{0%,35%,75%{filter:brightness(2);transform:translateX(-3px)}20%,55%,100%{filter:brightness(1);transform:none}}
+@media(prefers-reduced-motion:reduce){dialog.terminal-scene,dialog.dossier-scene,dialog.alert-scene{animation:none!important}}
