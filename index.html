@@ -79,7 +79,7 @@ const taunts=["Your confidence is statistically concerning.","My lawyer approved
 const defaults={wins:0,losses:0,draws:0,sound:false,mode:"fair",difficulty:"hard"};
 let settings={...defaults};
 try{const value=JSON.parse(localStorage.getItem("tic-tac-hell-v2")||"{}");for(const k of Object.keys(defaults))if(typeof value[k]===typeof defaults[k])settings[k]=value[k];}catch{}
-let board=[],n=3,turns=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[],awardedLines=new Set(),awardedMachineLines=new Set(),tantrumCount=0,previousMarks=new Map(),previousSize=3,previousScores={wins:settings.wins,losses:settings.losses,draws:settings.draws};
+let board=[],n=3,turns=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[],awardedLines=new Set(),awardedMachineLines=new Set(),tantrumCount=0,pendingErasure=false,previousMarks=new Map(),previousSize=3,previousScores={wins:settings.wins,losses:settings.losses,draws:settings.draws};
 const save=()=>{try{localStorage.setItem("tic-tac-hell-v2",JSON.stringify(settings));}catch{}};
 const random=a=>a[Math.floor(Math.random()*a.length)];
 const empty=()=>board.flatMap((row,r)=>row.map((v,c)=>v?"":r*n+c)).filter(v=>v!=="");
@@ -90,7 +90,7 @@ function log(message){const p=document.createElement("p");p.textContent=message;
 function animateOnce(element,cls){if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;element.classList.remove(cls);void element.offsetWidth;element.classList.add(cls);element.addEventListener("animationend",()=>element.classList.remove(cls),{once:true});}
 function say(message){$("status").textContent=message;animateOnce($("status"),"status-pulse");log(message);}
 function updateScore(){["wins","losses","draws"].forEach(k=>{const old=previousScores[k];$(k).textContent=settings[k];if(old!==settings[k]){animateOnce($(k).closest(".stat"),"stat-ping");previousScores[k]=settings[k];}});save();}
-function reset(){session++;n=3;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];awardedLines.clear();awardedMachineLines.clear();tantrumCount=0;document.querySelector(".tantrum-overlay")?.remove();previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Welcome to Tic Tac Hell. Winning is subject to judicial review.");draw();}
+function reset(){session++;n=3;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];awardedLines.clear();awardedMachineLines.clear();tantrumCount=0;pendingErasure=false;document.querySelector(".tantrum-overlay")?.remove();previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Welcome to Tic Tac Hell. Winning is subject to judicial review.");draw();}
 function lines(k){const arr=[],d=[[1,0],[0,1],[1,1],[1,-1]];for(let r=0;r<n;r++)for(let c=0;c<n;c++)for(const [dr,dc] of d){const e=[];for(let j=0;j<k;j++){const y=r+j*dr,x=c+j*dc;if(y<0||x<0||y>=n||x>=n)break;e.push(y*n+x);}if(e.length===k)arr.push(e);}return arr;}
 function match(who,oneAway=false){for(const line of lines(Math.min(n,5))){const values=line.map(get);if(oneAway?values.filter(v=>v===who).length===line.length-1&&values.includes(""):values.every(v=>v===who))return line;}return null;}
 function draw(){const el=$("board");const grew=n!==previousSize;const nextMarks=new Map();if(grew)animateOnce(el,"board-impact");previousSize=n;el.replaceChildren();el.style.gridTemplateColumns="repeat("+n+",minmax(0,1fr))";el.style.gridTemplateRows="repeat("+n+",minmax(0,1fr))";el.classList.toggle("big",n>3);$("board-size").textContent=n+" × "+n+" BOARD";$("mode-label").textContent=settings.mode==="fair"?"FAIR PLAY":"CHAOS PROTOCOL ACTIVE";$("round-label").textContent=finished?"Round complete.":thinking?"The AI is plotting.":"Your move, troublemaker.";$("difficulty").disabled=settings.mode==="hell";const clueText="Evidence: "+evidence.length+" · Guilty verdicts: "+convictions+"/3 · Clues: "+clues+"/5 · Shield: "+protection;if($("clue-count").textContent!==clueText){$("clue-count").textContent=clueText;animateOnce($("clue-count"),"clue-ping");}for(let i=0;i<n*n;i++){const b=document.createElement("button"),v=get(i);b.type="button";const key=Math.floor(i/n)+":"+(i%n);b.className="cell"+(v?" "+v.toLowerCase():"")+(v&&previousMarks.get(key)!==v?" fresh":"")+(winning.includes(i)?" win":"");if(v)nextMarks.set(key,v);b.textContent=v;b.setAttribute("aria-label","Row "+(Math.floor(i/n)+1)+", column "+(i%n+1)+(v?", "+v:" empty"));b.disabled=finished||thinking||!!v;b.addEventListener("click",()=>move(i));el.append(b);}previousMarks=nextMarks;}
@@ -130,13 +130,13 @@ setTimeout(()=>{
 function finishHellTurn(){
  if(turns>=5&&turns%3===2&&clues<5){clues++;say("A sealed transcript surfaced. FILE "+clues+"/5.");}
  if(convictions>=3&&clues>=5&&n===10&&!appealed){appealed=true;say("THE SUPREME COURT HAS LOST CONTROL. Final terminal command unlocked.");}
- thinking=false;draw();
+ thinking=pendingErasure;draw();
 }
 function tantrumScene(count,onDone){
  const e=document.createElement("div");e.className="tantrum-overlay";e.setAttribute("role","status");
  const phrases=["NO. NO. NO!","THAT DOESN'T COUNT!","I DEMAND A RECOUNT!","THE RULES ARE MINE!"];
  const big=document.createElement("strong");big.textContent=phrases[(count-1)%phrases.length];
- const small=document.createElement("span");small.textContent="THE MACHINE IS HAVING A FULL-SCALE TANTRUM";
+ const small=document.createElement("span");small.textContent=n===3?"I PLAYED PERFECTLY. THAT RESULT IS ILLEGAL.":n<10?"ACT "+(n-2)+": EMERGENCY RULE AMENDMENT INCOMING":"FINAL PROTOCOL: EVIDENCE DELETION AUTHORIZED";
  e.append(big,small);document.body.append(e);tone(130);
  const stamp=session;
  setTimeout(()=>{e.remove();if(stamp===session)onDone();},window.matchMedia("(prefers-reduced-motion: reduce)").matches?500:1600);
@@ -146,9 +146,9 @@ function erase(preferred){const xs=[];for(let i=0;i<n*n;i++)if(get(i)==="X")xs.p
  const targets=[];if(Number.isInteger(preferred)&&get(preferred)==="X"){targets.push(preferred);xs.splice(xs.indexOf(preferred),1);}
  while(targets.length<2&&xs.length){targets.push(xs.splice(Math.floor(Math.random()*xs.length),1)[0]);}
  if(!targets.length)return;
- const positions=targets.map(i=>[Math.floor(i/n),i%n]);
+ const positions=targets.map(i=>[Math.floor(i/n),i%n]);pendingErasure=true;thinking=true;
  for(const i of targets){const cell=$("board").children[i];if(cell)cell.classList.add("erasing");}
- const stamp=session;setTimeout(()=>{if(stamp!==session)return;for(const [r,c] of positions)if(board[r]?.[c]==="X")board[r][c]="";draw();say("THE MACHINE ERASED YOUR X. THAT WAS NOT A LEGAL MOVE.");},540);
+ const stamp=session;setTimeout(()=>{if(stamp!==session)return;for(const [r,c] of positions)if(board[r]?.[c]==="X")board[r][c]="";pendingErasure=false;thinking=false;draw();say("THE MACHINE ERASED YOUR X. THAT WAS NOT A LEGAL MOVE.");},540);
 }
 function hellAI(){
  const open=empty();
