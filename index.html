@@ -18,20 +18,40 @@ button,select,input{font:inherit}button{cursor:pointer}button:focus-visible,sele
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
 <link rel="stylesheet" href="court-drama.css">
+<link rel="stylesheet" href="arcade.css">
 </head>
-<body><div class="shell">
-<header><div><div class="eyebrow">A game that holds a grudge · v2.0</div><h1>TIC TAC <span>HELL.</span></h1><p class="subtitle">Nine squares. Zero respect for the rules. Play fair, or challenge the world's least impartial opponent.</p></div><div class="pill">✦ 100% fictional chaos</div></header>
-<main class="layout">
-<section class="panel arena" aria-label="Game arena"><div class="topline"><div><div class="label" id="mode-label">FAIR PLAY</div><h2 id="round-label">Your move, troublemaker.</h2></div><span class="pill" id="board-size">3 × 3 BOARD</span></div>
-<div class="status" id="status" role="status" aria-live="polite">Choose a square to begin.</div>
-<div class="board-wrap"><div id="board" class="board" role="group" aria-label="Tic tac toe board"></div></div>
-<div class="controls"><button class="btn primary" id="restart">↻ New round</button><button class="btn" id="reset-score">Reset scores</button></div></section>
-<aside class="side"><section class="panel settings"><div class="label">GAME CONFIGURATION</div><h2>Pick your poison.</h2><div class="switches">
-<label class="field" for="mode">Mode <select id="mode"><option value="fair">Fair play</option><option value="hell">Tic Tac Hell ☠</option></select></label>
-<label class="field" for="difficulty">Opponent <select id="difficulty"><option value="easy">Chill (still unbeatable)</option><option value="medium">Clever (still unbeatable)</option><option value="hard" selected>Merciless (unbeatable)</option></select></label>
-<label class="field" for="sound">Sound effects <input id="sound" type="checkbox"></label></div>
-<div class="stats"><div class="stat"><strong id="wins">0</strong><small>YOU</small></div><div class="stat"><strong id="losses">0</strong><small>AI</small></div><div class="stat"><strong id="draws">0</strong><small>DRAWS</small></div></div></section>
-<section class="panel chronicle"><div class="label">THE CHAOS DEPARTMENT</div><h2>Incident log</h2><div class="story-actions"><button class="btn" id="court">⚖ Courtroom</button><button class="btn" id="terminal">⌘ Terminal</button><button class="btn" id="fake-os">⚠ Fake OS alert</button><button class="btn" id="clue">✦ Case dossier</button></div><p class="clues" id="clue-count">Hell clues collected: 0 / 5</p><div class="log" id="log" aria-label="Game log" aria-live="polite"></div></section></aside></main>
+<body><div class="shell arcade-shell">
+<header class="arcade-header">
+ <div class="brand-mark" aria-hidden="true"><span>✕</span><span>○</span></div>
+ <div class="brand-copy"><div class="eyebrow">UNFAIR GAMES STUDIOS / EXPERIMENT 001</div><h1>TIC TAC <span>HELL<span class="title-dot">.</span></span></h1><p class="subtitle">The board is rigged. The courtroom is worse.</p></div>
+ <div class="header-stamp"><span class="stamp-pulse"></span> THE SYSTEM IS WATCHING <small>EST. 6.66</small></div>
+</header>
+<div class="marquee-line" aria-hidden="true"><span>NO FAIR PLAY GUARANTEED</span><b>✦</b><span>YOUR MOVE IS EVIDENCE</span><b>✦</b><span>THE MACHINE NEVER FORGETS</span><b>✦</b><span>NO FAIR PLAY GUARANTEED</span></div>
+<main class="layout arcade-layout">
+<section class="panel arena arcade-arena" aria-label="Game arena">
+ <div class="arena-head"><div><div class="label" id="mode-label">CHAOS PROTOCOL ACTIVE</div><h2 id="round-label">Your move, troublemaker.</h2></div><span class="board-counter" id="board-size">3 × 3 BOARD</span></div>
+ <div class="status arcade-status" id="status" role="status" aria-live="polite">The machine has entered the room.</div>
+ <div class="board-wrap arena-stage"><div class="stage-crosshair top-left" aria-hidden="true">+</div><div class="stage-crosshair bottom-right" aria-hidden="true">+</div><div class="arena-orbit" aria-hidden="true"></div><div id="board" class="board" role="group" aria-label="Tic tac toe board"></div></div>
+ <div class="controls arena-controls"><button class="btn primary" id="restart">↻ RESTART ROUND</button><button class="btn" id="reset-score">CLEAR RECORDS</button><span class="arena-footnote">X = YOU &nbsp; / &nbsp; O = THE MACHINE</span></div>
+</section>
+<aside class="side arcade-sidebar">
+ <section class="panel settings arcade-settings">
+ <div class="section-heading"><div><div class="label">01 / CONTROL ROOM</div><h2>Choose your fate.</h2></div><span class="section-glyph">⌘</span></div>
+ <div class="switches">
+  <label class="field" for="mode"><span>GAME PROTOCOL</span><select id="mode"><option value="fair">Fair play</option><option value="hell">Tic Tac Hell ☠</option></select></label>
+  <label class="field" for="difficulty"><span>AI PERSONALITY</span><select id="difficulty"><option value="easy">Chill (still unbeatable)</option><option value="medium">Clever (still unbeatable)</option><option value="hard" selected>Merciless (unbeatable)</option></select></label>
+  <label class="field sound-field" for="sound"><span>SOUND DESIGN</span><input id="sound" type="checkbox"><span class="toggle-decoration" aria-hidden="true"></span></label>
+ </div>
+ <div class="stats"><div class="stat"><small>HUMAN</small><strong id="wins">0</strong></div><div class="stat"><small>MACHINE</small><strong id="losses">0</strong></div><div class="stat"><small>STALEMATE</small><strong id="draws">0</strong></div></div>
+ </section>
+ <section class="panel chronicle arcade-chronicle">
+ <div class="section-heading"><div><div class="label">02 / RESTRICTED ACCESS</div><h2>The dark archive.</h2></div><span class="section-glyph">◈</span></div>
+ <div class="story-actions"><button class="btn court-entry" id="court"><span class="action-icon">⚖</span><span>THE COURTROOM<small>DEFEND YOUR CASE</small></span><span class="action-arrow">↗</span></button><button class="btn" id="terminal"><span class="action-icon">⌘</span><span>TERMINAL<small>HIDDEN COMMANDS</small></span><span class="action-arrow">↗</span></button><button class="btn" id="fake-os"><span class="action-icon">⚠</span><span>SYSTEM ALERT<small>FICTIONAL ERRORS</small></span><span class="action-arrow">↗</span></button><button class="btn" id="clue"><span class="action-icon">✦</span><span>CASE DOSSIER<small>SEALED EVIDENCE</small></span><span class="action-arrow">↗</span></button></div>
+ <p class="clues" id="clue-count">Evidence: 0 · Guilty verdicts: 0/3 · Clues: 0/5 · Shield: 0</p>
+ <div class="log-heading"><span class="live-dot"></span> INCOMING TRANSMISSIONS <span>LIVE FEED</span></div>
+ <div class="log" id="log" aria-label="Game log" aria-live="polite"></div>
+ </section>
+</aside></main>
 <div class="footer"><span>Built for humans who enjoy losing arguments to rectangles.</span><span><a href="https://github.com/Mrudula-itsjuzme/Tictactoe" target="_blank" rel="noopener noreferrer">Source on GitHub ↗</a> · No tracking, no accounts</span></div>
 </div>
 <dialog id="modal" aria-labelledby="modal-title"><h2 id="modal-title"></h2><p id="modal-text"></p><div id="modal-extras"></div><div class="controls" id="modal-actions"></div></dialog>
