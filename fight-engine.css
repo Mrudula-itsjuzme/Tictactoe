@@ -63,3 +63,28 @@
 .combat-spark{position:absolute;z-index:10;color:#ffef99;text-shadow:0 0 25px #ff679f;font:900 clamp(2rem,5vw,4rem) Impact,system-ui;pointer-events:none;animation:combatImpact .35s ease-out both}
 @keyframes combatImpact{0%{opacity:0;transform:scale(.3) rotate(-30deg)}30%{opacity:1;transform:scale(1.35) rotate(15deg)}100%{opacity:0;transform:scale(1.9) rotate(35deg)}}
 @media(prefers-reduced-motion:reduce){.fighter.walking .fighter-leg,.fighter.fast-swing .fighter-arm.near,.fighter.heavy-swing .fighter-arm.near,.combat-spark{animation:none!important}}
+
+
+/* Trial Combat v2: responsive arena, round clock, stamina and cinematic tells. */
+.fight-v2{background:radial-gradient(ellipse at 50% 60%,#542047,#140917 70%);isolation:isolate}
+.fight-v2 .fight-head{grid-template-columns:minmax(0,1fr) minmax(145px,auto) minmax(0,1fr);gap:clamp(8px,2vw,30px);border-bottom:2px solid #e6a36c;box-shadow:0 12px 35px #0009}
+.fight-v2 .fight-level{display:flex;flex-direction:column;align-items:center;gap:3px;font:900 .72rem ui-sans-serif,system-ui;color:#ffdca9}
+.fight-v2 .fight-level [data-clock]{font:900 clamp(1.6rem,4vw,3.2rem)/.95 Impact,system-ui;color:#fff2df;text-shadow:0 0 22px #fb6984}
+.fight-v2 .fight-level small{font:.65rem ui-sans-serif,system-ui;letter-spacing:.1em;color:#c1a4be}
+.fight-v2 .fight-meter.stamina{height:7px;margin:4px 0;border-color:#8a7499}
+.fight-v2 .fight-meter.stamina i{background:linear-gradient(90deg,#ffda7b,#fff0bd)}
+.fight-v2 .fight-announcer{font:900 .77rem/1.3 system-ui;letter-spacing:.1em;padding:9px;border-bottom:1px solid #ffc28b77;background:#35172acc;min-height:37px}
+.fight-v2 .fight-floor{border-bottom:16px solid #ae5d79;background:radial-gradient(ellipse at 50% 90%,#ce7f8447,transparent 55%),linear-gradient(#2e1531,#130b20);isolation:isolate}
+.fight-v2 .fight-scenery{position:absolute;left:50%;bottom:6%;transform:translateX(-50%);font-size:min(31vw,280px);line-height:1;color:#ffc68b12;text-shadow:0 0 55px #ffba8733;pointer-events:none}
+.fight-v2 .fight-floor:before{content:"";pointer-events:none;position:absolute;inset:0;background:repeating-linear-gradient(90deg,#eeae9230 0 3px,transparent 3px 23%);mask-image:linear-gradient(transparent,#000 75%)}
+.fight-v2 .fight-particles{position:absolute;inset:0;pointer-events:none;z-index:12}
+.fight-v2 .fight-warning{inset:13% 4% 23%;border-radius:8px}
+.fight-v2 .fighter{width:clamp(65px,12vw,145px);height:clamp(125px,22vw,255px);transition:none}
+.fight-v2 .fighter .fighter-body{height:89%}
+.fight-v2 .fighter .fighter-name{background:#120b19bd;border:1px solid #f1bc9c;padding:4px 7px;font-size:.67rem}
+.fight-v2 .fighter.blocking .fighter-aura{filter:drop-shadow(0 0 25px #ffdc76)}
+.fight-v2 .fighter.airborne .fighter-body{filter:drop-shadow(0 0 18px #acfbe1)}
+.fight-v2 .fight-help{font-size:.63rem;padding:10px}
+.fight-v2 .combat-spark{font-size:clamp(2.5rem,5vw,5rem);text-shadow:0 0 25px #ffe788,0 0 45px #ff4c9f}
+@media(max-width:700px){.fight-v2 .fight-head{grid-template-columns:1fr auto 1fr;gap:7px;padding:9px 8px}.fight-v2 .fight-level{font-size:.5rem}.fight-v2 .fight-level small{font-size:.47rem}.fight-v2 .fight-side>b{font-size:.55rem}.fight-v2 .fight-help{font-size:.53rem;padding:6px}.fight-v2 .fighter{height:135px;width:75px}}
+@media(prefers-reduced-motion:reduce){.fight-v2 .combat-spark,.fight-v2 .fight-warning.active{animation:none!important}}
