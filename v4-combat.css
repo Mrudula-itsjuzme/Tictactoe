@@ -117,3 +117,22 @@ dialog.alert-scene{border:2px solid #ff566d;background:#360d22;box-shadow:0 0 75
 @media(prefers-reduced-motion:reduce){
  .arcade-arena .cell.corrupting,.tantrum-overlay strong{animation:none!important}
 }
+
+
+/* Winning is an event, not a silent scoreboard increment. */
+.arcade-arena .cell.scored-line{position:relative;z-index:4!important;animation:scoreGlow .28s ease-in-out infinite alternate!important}
+.arcade-arena .cell.scored-line.o{border-color:#ff74bb!important;box-shadow:0 0 22px #fd3d9f8c,inset 0 0 22px #ff5a9b5c}
+.arcade-arena .cell.scored-line.x{border-color:#8affe9!important;box-shadow:0 0 22px #54f4e68c,inset 0 0 22px #5ff9e757}
+@keyframes scoreGlow{to{filter:brightness(1.8);transform:scale(.96)}}
+.arcade-arena .board.machine-win-burst{filter:drop-shadow(0 0 32px #ff438e7c)}
+.arcade-arena .board.human-win-burst{filter:drop-shadow(0 0 32px #56ffe47c)}
+.victory-cutscene{position:fixed;inset:0;z-index:7900;pointer-events:none;display:flex;flex-direction:column;gap:20px;align-items:center;justify-content:center;text-align:center;padding:24px;isolation:isolate;animation:victoryVisit 1.42s ease both}
+.victory-cutscene:before{content:"";position:absolute;z-index:-1;inset:-70%;background:repeating-conic-gradient(from 12deg at center,#fff5 0 3deg,transparent 3deg 17deg);animation:celebrateSpin 12s linear infinite}
+.victory-cutscene.machine-celebration{background:radial-gradient(ellipse at center,#a40c57ee,#140718eb 73%);color:#ffe7cb}
+.victory-cutscene.human-celebration{background:radial-gradient(ellipse at center,#116c6fee,#061820ed 73%);color:#e8fff6}
+.victory-cutscene strong{font:italic 900 clamp(2rem,7vw,7rem)/1 Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif;max-width:min(1100px,100%);overflow-wrap:anywhere;text-shadow:5px 7px #190719;letter-spacing:.01em}
+.victory-cutscene span{font:900 clamp(.7rem,1.4vw,1.15rem) system-ui;letter-spacing:.14em;color:#ffda90}
+.victory-cutscene.human-celebration span{color:#a9ffeb}
+@keyframes victoryVisit{0%{opacity:0;transform:scale(1.12)}16%,72%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.97)}}
+@keyframes celebrateSpin{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){.arcade-arena .cell.scored-line,.victory-cutscene,.victory-cutscene:before{animation:none!important}.victory-cutscene{opacity:1}}
