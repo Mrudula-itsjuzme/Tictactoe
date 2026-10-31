@@ -115,3 +115,7 @@ The public help walkthrough was removed to preserve discovery. Hell-mode board e
 ## Arcade UI redesign (October 2026)
 
 The web edition now uses a completely reworked arcade-inspired layout: bold title treatment, central game arena with patterned stage and oversize board, a control room for mode/personality/audio, and a separate Dark Archive for courtroom, terminal, alerts and dossier. The redesign stays responsive, keeps all existing control IDs and game mechanics, uses only original CSS and in-repository artwork, and respects reduced-motion preferences. The entry point remains `index.html`; visual overrides live in `arcade.css`.
+
+## Title screen and fullscreen game (October 2026)
+
+The browser experience opens on a separate cinematic title screen. Choose **Enter the Game** to transition into a compact gameplay view using a CSS wipe. The **Title Screen** control returns to the opening screen without resetting the current game. On desktop, the game board, controls and case archive occupy a viewport-height layout with the transmission log scrolling independently. Smaller screens reflow responsively to keep controls reachable. The transition and animated splash honor reduced-motion preferences. Implemented in `two-screen.css` and `index.html` without additional dependencies.
