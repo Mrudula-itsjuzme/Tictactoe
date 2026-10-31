@@ -34,3 +34,7 @@
 .theatre[data-act="verdict"] .court-jury span:nth-child(3n){animation-delay:.17s}
 @media(max-width:700px){.ops-workspace{grid-template-columns:1fr;min-height:340px}.ops-nav{flex-direction:row;flex-wrap:wrap;gap:3px}.ops-nav button{padding:8px;font-size:.64rem}.ops-view{min-height:270px;padding:10px}.ops-result{min-height:180px}.dossier-workspace{grid-template-columns:1fr;grid-template-rows:auto minmax(80px,auto) minmax(270px,1fr);max-height:70dvh}.dossier-list{max-height:105px}.dossier-editor{padding:12px}.dossier-toolbar>span{font-size:.62rem}}
 @media(prefers-reduced-motion:reduce){.theatre[data-act="verdict"] .court-jury span{animation:none!important}}
+
+/* Readable focus for keyboard board navigation and court evidence controls. */
+.arcade-arena .cell:focus-visible{outline:3px solid #ffda8a!important;outline-offset:-4px;box-shadow:0 0 0 3px #201329,0 0 26px #6affd8!important;z-index:5}
+.ops-nav button:focus-visible,.dossier-editor button:focus-visible,.evidence-file:focus-visible,.game-tab:focus-visible{outline:2px solid #9effde;outline-offset:3px}
