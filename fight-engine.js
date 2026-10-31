@@ -24,7 +24,14 @@ class FightEngine{
  flash(el){el.classList.remove("damaged");void el.offsetWidth;el.classList.add("damaged");}
  aiAction(){const p=this.player,b=this.bot,dist=Math.abs(p.x-b.x);if(b.stun>0||this.paused)return;const approaching=dist>17;
  if(approaching){b.guard=false;b.x+=Math.sign(p.x-b.x)*(7+this.level*.6)*.28;this.enemyState="approach";this.enemyTimer=.15;return;}
- const choices=["strike","guard","heavy","strike","dodge"];const choice=choices[(this.attacks+this.level+Math.floor(p.hp/30))%choices.length];this.attacks++;this.enemyState=choice;
+ const choices=["strike","guard","heavy","strike","dodge"];
+ // Reactive opponent: punish indefinite blocking, evade charging attacks,
+ // and defend when close to defeat. Predictable wind-ups preserve fairness.
+ let choice=choices[(this.attacks+this.level+Math.floor(p.hp/30))%choices.length];
+ if(this.keys.has("l"))choice="heavy";
+ else if(p.cool>.43&&dist<16)choice="dodge";
+ else if(b.hp<b.max*.28&&this.attacks%3===0)choice="guard";
+ this.attacks++;this.enemyState=choice;
  if(choice==="guard"){b.guard=true;this.announce("ENEMY GUARDS · USE HEAVY TO BREAK");this.enemyTimer=.8;return;}
  b.guard=false;
  if(choice==="dodge"){b.x=clamp(b.x+(b.x>p.x?9:-9),7,93);this.announce("COUNSEL O.S. EVADES");this.enemyTimer=.5;return;}
