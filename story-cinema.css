@@ -42,3 +42,24 @@
 @media(max-height:650px){.story-scene{height:96dvh}.story-banner{padding-top:10px}.story-banner h2{font-size:clamp(1.5rem,4vw,3rem)}.story-dialog{min-height:130px;padding:13px}.story-dialog p{min-height:40px;font-size:1rem}.story-character{max-height:210px}}
 @media(max-width:600px){.story-scene{width:100vw;height:100dvh}.story-top{padding:12px}.story-top span{font-size:.52rem;letter-spacing:.1em}.story-banner h2{font-size:clamp(2rem,8vw,3.4rem)}.story-dialog{padding:16px;min-height:190px}.story-dialog p{font-size:1.04rem}.story-character{max-height:240px}.story-portraits strong{padding:7px 10px;font-size:.65rem;bottom:3px}}
 @media(prefers-reduced-motion:reduce){.story-lighting,.story-scene,.story-character,.story-dialog p{animation:none!important}}
+
+
+/* Cinematic story art: chapter illustrations become the hero.
+   The original CSS characters remain as a missing-image fallback. */
+.story-scene{position:relative;grid-template-rows:auto auto minmax(0,1fr) auto}
+.story-artwork{position:absolute;z-index:0;inset:0;overflow:hidden;pointer-events:none}
+.story-artwork img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 49%;opacity:0;transform:scale(1.09);transition:opacity .55s,transform 8s ease-out;filter:saturate(1.12) contrast(1.05)}
+.story-cinema.has-story-art .story-artwork img{opacity:1;transform:scale(1)}
+.story-artwork:after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,#090615a8 0%,transparent 16%,transparent 42%,#0e06149c 68%,#100a1bf9 94%),linear-gradient(90deg,#12071950,transparent 28%,transparent 75%,#12071948)}
+.story-cinema.has-story-art .story-portraits{visibility:hidden}
+.story-cinema.has-story-art .story-banner{align-self:start;z-index:3;padding-top:clamp(9px,2vh,20px)}
+.story-cinema.has-story-art .story-banner h2{font:italic 900 clamp(1.3rem,3.1vw,3.2rem)/1.06 Georgia,serif;color:#fff3e6;text-shadow:0 2px 14px #0a0414,2px 3px #6a2144;max-width:90%;margin-top:3px}
+.story-cinema.has-story-art .story-top{z-index:4;background:linear-gradient(90deg,#0e0916dc,#11071f8c);border-bottom-color:#f9ba8c50}
+.story-cinema.has-story-art .story-dialog{position:relative;z-index:4;background:linear-gradient(110deg,#100b1af7,#26132cf4);border-top:2px solid #fbbd8b}
+.story-cinema.has-story-art .story-dialog p{font-size:clamp(1rem,1.75vw,1.38rem);min-height:3rem}
+.story-cinema.has-story-art .story-portraits strong{visibility:visible;position:absolute;bottom:5px;left:clamp(18px,3vw,34px);background:#210e27c9}
+.story-cinema.has-story-art .story-lighting{opacity:.35;animation:none}
+.story-cinema.has-story-art.story-machine .story-artwork img{animation:artTremor .28s step-end 2}
+@keyframes artTremor{0%,100%{translate:0 0}24%{translate:-4px 1px}48%{translate:4px -1px}70%{translate:-1px 3px}}
+@media(max-width:650px){.story-cinema.has-story-art .story-banner h2{font-size:clamp(1.25rem,5vw,2rem)}.story-cinema.has-story-art .story-artwork img{object-position:center}.story-artwork:after{background:linear-gradient(180deg,#0d0719be,transparent 22%,#0d0812ba 65%,#0b0715f4)}}
+@media(prefers-reduced-motion:reduce){.story-artwork img,.story-cinema.has-story-art.story-machine .story-artwork img{transition:none!important;animation:none!important;transform:none!important}}
