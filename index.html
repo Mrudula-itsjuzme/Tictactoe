@@ -25,7 +25,7 @@ button,select,input{font:inherit}button{cursor:pointer}button:focus-visible,sele
 <section class="panel arena" aria-label="Game arena"><div class="topline"><div><div class="label" id="mode-label">FAIR PLAY</div><h2 id="round-label">Your move, troublemaker.</h2></div><span class="pill" id="board-size">3 × 3 BOARD</span></div>
 <div class="status" id="status" role="status" aria-live="polite">Choose a square to begin.</div>
 <div class="board-wrap"><div id="board" class="board" role="group" aria-label="Tic tac toe board"></div></div>
-<div class="controls"><button class="btn primary" id="restart">↻ New round</button><button class="btn" id="reset-score">Reset scores</button><button class="btn" id="help">? How to play</button></div></section>
+<div class="controls"><button class="btn primary" id="restart">↻ New round</button><button class="btn" id="reset-score">Reset scores</button></div></section>
 <aside class="side"><section class="panel settings"><div class="label">GAME CONFIGURATION</div><h2>Pick your poison.</h2><div class="switches">
 <label class="field" for="mode">Mode <select id="mode"><option value="fair">Fair play</option><option value="hell">Tic Tac Hell ☠</option></select></label>
 <label class="field" for="difficulty">Opponent <select id="difficulty"><option value="easy">Chill (still unbeatable)</option><option value="medium">Clever (still unbeatable)</option><option value="hard" selected>Merciless (unbeatable)</option></select></label>
@@ -64,29 +64,44 @@ function evaluate3(cells){const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2
 function minimax(b,depth,isAI,alpha,beta){const v=evaluate3(b);if(v)return v==="O"?10-depth:v==="X"?depth-10:0;let best=isAI?-Infinity:Infinity;for(const i of [4,0,2,6,8,1,3,5,7]){if(b[i])continue;b[i]=isAI?"O":"X";let score=minimax(b,depth+1,!isAI,alpha,beta);b[i]="";best=isAI?Math.max(best,score):Math.min(best,score);if(isAI)alpha=Math.max(alpha,best);else beta=Math.min(beta,best);if(beta<=alpha)break;}return best;}
 function pickAI(){const available=empty();if(!available.length)return null;const flat=board.flat();let best=-Infinity,choices=[];for(const i of available){flat[i]="O";const score=minimax(flat,0,false,-Infinity,Infinity);flat[i]="";if(score>best){best=score;choices=[i];}else if(score===best)choices.push(i);}/* Every personality chooses only minimax-optimal moves. The AI cannot lose from an empty 3x3 board. */return random(choices);}
 function move(i){if(finished||thinking||get(i))return;set(i,"X");turns++;tone(520);if(settings.mode==="fair"){const w=match("X");if(w)return conclude("X",w);if(!empty().length)return conclude("draw");thinking=true;say("The AI is considering your questionable life choices.");draw();const stamp=session;setTimeout(()=>{if(stamp!==session)return;thinking=false;const p=pickAI();if(p!==null)set(p,"O");tone(310);const aw=match("O");if(aw)return conclude("O",aw);if(!empty().length)return conclude("draw");const lines={easy:["I am relaxed, not incompetent.","A friendly reminder: I cannot lose."],medium:["I saw that coming.","Nice try. I calculated all of that."],hard:taunts};say(random(lines[settings.difficulty]||taunts));draw();},220);return;}
-if(match("X")||match("X",true)||turns%4===0)cheat();else{hellAI();say(random(taunts));}
-if(turns%5===0&&clues<5){clues++;say("CASE FILE "+clues+"/5: THE RULES ARE NOT REAL.");}if(convictions>=3&&clues>=5&&n===10&&!appealed){appealed=true;say("THE SUPREME COURT HAS LOST CONTROL. Final terminal command unlocked.");}
+// Hell is narratively rigged: five Xs trigger a rule-breaking intervention, never a regular win.
+if(match("X")||match("X",true)){cheat(true);}
+else if(turns%3===0){cheat(false);}
+else{hellAI();say(random(taunts));}
+if(turns%4===0&&clues<5){clues++;say("A sealed transcript surfaced. FILE "+clues+"/5.");}if(convictions>=3&&clues>=5&&n===10&&!appealed){appealed=true;say("THE SUPREME COURT HAS LOST CONTROL. Final terminal command unlocked.");}
 draw();}
 function expand(){if(n>=10)return false;const old=board;n++;board=Array.from({length:n},(_,r)=>Array.from({length:n},(_,c)=>old[r]?.[c]||""));return true;}
 function erase(){const xs=[];for(let i=0;i<n*n;i++)if(get(i)==="X")xs.push(i);for(let k=0;k<Math.min(2,xs.length);k++){const pick=Math.floor(Math.random()*xs.length);set(xs.splice(pick,1)[0],"");}}
-function hellAI(){const open=empty();if(!open.length){if(n<10){expand();say("New squares added. Please stop asking questions.");}else{erase();say("Evidence destroyed: two of your X marks removed.");}return;}set(random(open),"O");if(match("O")){erase();say("I WON. The judge is also me. Two X marks dismissed.");}}
-function cheat(){
+function hellAI(){const open=empty();if(!open.length){if(n<10){expand();say("The board expanded. There is nowhere left to hide.");}else{erase();say("The machine erased two occupied squares.");}return;}
+  // Block immediate wins first; otherwise add pressure around existing O marks.
+  const threats=lines(Math.min(n,5)).filter(line=>line.filter(i=>get(i)==="X").length===line.length-1&&line.filter(i=>!get(i)).length===1);
+  const blockers=threats.map(line=>line.find(i=>!get(i))).filter(i=>i!==undefined);
+  const pressure=open.map(i=>({i,score:lines(Math.min(n,5)).reduce((v,line)=>v+(line.includes(i)?line.filter(j=>get(j)==="O").length:0),0)}));
+  pressure.sort((a,b)=>b.score-a.score);
+  set(blockers.length?random(blockers):pressure[0].i,"O");
+  if(match("O")){erase();say("I WON. The court has ordered your last two marks removed.");}}
+function cheat(emergency=false){
   cheats++;
   let type,description,action;
-  const trick=Math.floor(Math.random()*4);
-  if(n<10&&(trick<2||match("X"))){
+  // Growth is part of chapter progression, not a random possibility. Protection never blocks growth.
+  const mustGrow=n<10&&(cheats%2===1 || emergency);
+  if(mustGrow){
     type="boundary";description="The board expanded without player approval.";
-    action=()=>{expand();say("CONSTITUTIONAL AMENDMENT: "+n+" by "+n+" board. Retroactive, naturally.");};
-  }else if(trick===2){
+    action=()=>{expand();say("THE COURT HAS AMENDED THE BOARD: "+n+" by "+n+".");};
+  }else if(emergency||cheats%3===0){
     type="erasure";description="The AI erased your placed X marks.";
-    action=()=>{erase();say("Your progress has been recalled for safety reasons.");};
+    action=()=>{erase();say("YOUR WINNING LINE HAS BEEN EXPUNGED.");};
   }else{
     type="double";description="The AI took two turns in a row.";
-    action=()=>{hellAI();hellAI();say("Executive order: two AI turns. Objections denied.");};
+    action=()=>{hellAI();hellAI();say("EXECUTIVE ORDER: TWO AI TURNS. NO APPEALS.");};
   }
   evidence.push({id:cheats,type,description,used:false});
-  if(protection>0){protection--;animateOnce($("board"),"board-impact");say("COURT INJUNCTION ENFORCED: cheating attempt #"+cheats+" blocked. New evidence logged.");}
-  else {action();animateOnce($("board"),"board-impact");}
+  if(mustGrow){action();if(protection>0)say("The court claims board expansion is exempt from injunctions.");}
+  else if(protection>0){protection--;say("INJUNCTION ENFORCED: attempted cheat #"+cheats+" blocked. Evidence preserved.");}
+  else action();
+  // Even a shield must never grant a normal victory in the intentionally rigged mode.
+  if(match("X")){if(n<10)expand();else erase();say("EMERGENCY DECREE: A PLAYER WIN IS CONSTITUTIONALLY IMPOSSIBLE.");}
+  animateOnce($("board"),"board-impact");
   if(n===10&&turns%6===0)log("FICTIONAL OS ALERT: fairness.dll has left the chat.");
   tone(130);
 }
@@ -112,13 +127,13 @@ function court(){
   }});
 }
 function modal(title,message,choices,extra){$("modal-title").textContent=title;$("modal-text").textContent=message;$("modal-extras").replaceChildren();$("modal-actions").replaceChildren();if(extra)$("modal-extras").append(extra);for(const c of choices){const b=document.createElement("button");b.className="btn"+(c.primary?" primary":"");b.textContent=c.label;b.addEventListener("click",()=>{ $("modal").close();if(c.action)c.action();});$("modal-actions").append(b);}if(!$("modal").open)$("modal").showModal();}
-function terminal(){const input=document.createElement("input");input.className="command";input.placeholder="Try: help, win, sudo win, delete ai";input.setAttribute("aria-label","Fictional terminal command");const run=()=>{const cmd=input.value.trim().toLowerCase();$("modal").close();if(cmd==="who_makes_the_rules"&&n===10&&clues===5&&convictions>=3&&appealed){ending();return;}const map={help:"Commands: help, win, sudo win, delete ai, who_makes_the_rules",win:"403: Happiness forbidden.","sudo win":"Administrator of nothing.","delete ai":"I pay rent here.",who_makes_the_rules:"LOCKED: reach 10×10, collect five clues and win three court cases."};say(map[cmd]||"Unknown command. Your keyboard is on trial.");};input.addEventListener("keydown",e=>{if(e.key==="Enter")run();});modal("Fictional terminal","This terminal is make-believe. It never executes OS commands.",[{label:"Run command",primary:true,action:run},{label:"Cancel"}],input);input.focus();}
+function terminal(){const input=document.createElement("input");input.className="command";input.placeholder="Enter a command…";input.setAttribute("aria-label","Fictional terminal command");const run=()=>{const cmd=input.value.trim().toLowerCase();$("modal").close();if(cmd==="who_makes_the_rules"&&n===10&&clues===5&&convictions>=3&&appealed){ending();return;}const map={help:"Commands: help, win, sudo win, delete ai, who_makes_the_rules",win:"403: Happiness forbidden.","sudo win":"Administrator of nothing.","delete ai":"I pay rent here.",who_makes_the_rules:"ACCESS DENIED. The sealed transcripts mention a compromised court."};say(map[cmd]||"Unknown command. Your keyboard is on trial.");};input.addEventListener("keydown",e=>{if(e.key==="Enter")run();});modal("SEALED ARCHIVE","A broken cursor blinks under a classified court seal.",[{label:"Run command",primary:true,action:run},{label:"Cancel"}],input);input.focus();}
 function ending(){modal("THE LAST SQUARE","You found the rules, exposed the judge, and hacked the court. Choose your ending.",[{label:"Delete the rules",primary:true,action:()=>{finished=true;say("SECRET ENDING: YOU WIN. For real. The court is abolished.");draw();}},{label:"Become the AI",action:()=>{finished=true;say("SECRET ENDING: YOU ARE THE AI NOW. The old AI objects.");draw();}}]);}
 $("restart").addEventListener("click",reset);$("reset-score").addEventListener("click",()=>modal("Erase the scoreboard?","Your victories, defeats and stalemates will be forgotten.",[{label:"Keep them"},{label:"Reset",primary:true,action:()=>{settings.wins=settings.losses=settings.draws=0;updateScore();reset();}}]));
 $("mode").addEventListener("change",e=>{settings.mode=e.target.value;save();reset();});$("difficulty").addEventListener("change",e=>{settings.difficulty=e.target.value;save();reset();});$("sound").addEventListener("change",e=>{settings.sound=e.target.checked;save();tone(600);});
 $("court").addEventListener("click",court);$("terminal").addEventListener("click",terminal);$("fake-os").addEventListener("click",()=>modal("FICTIONAL OS WARNING","fairness.dll is missing. Your actual device is fine. The AI's ego is not.",[{label:"Acknowledge",primary:true}]));
-$("clue").addEventListener("click",()=>modal("Case file",settings.mode==="hell"?"COURT DOCKET: "+evidence.filter(e=>!e.used).length+" untried exhibits; "+convictions+"/3 guilty verdicts; "+protection+" protected cheats remaining. Prosecute the oldest evidence by matching the charge to the offense. After five clues, three convictions and a 10×10 board, enter who_makes_the_rules in the terminal.":"Switch to Hell mode to uncover the courtroom conspiracy.",[{label:"Got it",primary:true}]));
-$("help").addEventListener("click",()=>modal("How to play","Fair mode: place X and make three in a row. Choose Chill, Clever or Unbeatable AI. Hell mode: the computer cheats, expands the board up to 10×10, and hides two secret endings. Its five-in-a-row rules are intentionally unfair. Catch cheating attempts as evidence, prosecute the correct charge in court, and earn injunctions that stop future tricks.",[{label:"Let's play",primary:true}]));
+$("clue").addEventListener("click",()=>modal("Case file",settings.mode==="hell"?"UNSEALED CASE DOSSIER: "+evidence.filter(e=>!e.used).length+" pending exhibits. "+courtHistory.length+" verdicts. "+clues+" intercepted transcripts. "+(clues>=3?"Transcript fragment: WHO MAKES THE RULES?":"The court is hiding a command behind its verdicts."):"The case dossier remains sealed.",[{label:"Got it",primary:true}]));
+
 $("mode").value=settings.mode;$("difficulty").value=settings.difficulty;$("sound").checked=settings.sound;updateScore();reset();
 })();
 </script></body></html>
