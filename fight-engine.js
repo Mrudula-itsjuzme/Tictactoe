@@ -44,6 +44,7 @@ class CourtFight {
   this.root.focus();this.paint();this.raf=requestAnimationFrame(t=>this.frame(t));
  }
  fighter(x,hp,stamina,facing){return {x,y:0,vy:0,hp,maxHp:hp,sp:stamina,face:facing,stun:0,iframes:0,dodge:0,guard:false,move:null,attackUsed:false,active:false,combo:0,stagger:0};}
+ tone(freq=320,duration=.1){if(!this.sound)return;try{const C=window.AudioContext||window.webkitAudioContext;if(!C)return;const a=this.audio||(this.audio=new C()),o=a.createOscillator(),g=a.createGain();o.type="triangle";o.frequency.setValueAtTime(freq,a.currentTime);o.frequency.exponentialRampToValueAtTime(Math.max(60,freq*.62),a.currentTime+duration);g.gain.setValueAtTime(.038,a.currentTime);g.gain.exponentialRampToValueAtTime(.001,a.currentTime+duration);o.connect(g).connect(a.destination);o.start();o.stop(a.currentTime+duration);}catch{}}
  announce(message){this.announceEl.textContent=message;}
  input(k){if(k==="j")this.begin(this.player,"light");if(k==="k")this.begin(this.player,"heavy");if(k==="u")this.begin(this.player,"special");if(k===" " )this.dodge(this.player);if((k==="w"||k==="arrowup")&&this.player.y===0&&this.player.stun<=0){this.player.vy=62;}}
  begin(actor,type){
@@ -64,7 +65,7 @@ class CourtFight {
   let damage=blocked?Math.ceil(def.damage*.14):def.damage;
   if(blocked){target.sp=Math.max(0,target.sp-(def.stamina+7));if(def===MOVES.heavy||def===MOVES.special){target.stun=.36;this.announce("GUARD BREAK!");}}
   else target.stun=def.stun;
-  target.hp=Math.max(0,target.hp-damage);
+  target.hp=Math.max(0,target.hp-damage);this.tone(blocked?200:def===MOVES.special?115:350,blocked?.07:.17);
   target.x=clamp(target.x+attacker.face*def.knock,6,94);
   attacker.sp=Math.min(100,attacker.sp+8);
   if(attacker===this.player){this.combo=this.t-this.lastConnect<1.2?this.combo+1:1;this.lastConnect=this.t;}
@@ -126,7 +127,7 @@ class CourtFight {
  }
  finishRound(win){
   if(this.complete)return;this.complete=true;this.warnEl.classList.remove("active");
-  if(win)this.wins++;else this.enemyWins++;
+  if(win)this.wins++;else this.enemyWins++;this.tone(win?640:115,.35);
   this.announce(win?"ROUND TO THE HUMAN!":"ROUND TO COUNSEL O.S.!");
   this.paint();
   if(this.wins>=2||this.enemyWins>=2){this.finishMatch(this.wins>=2);return;}
@@ -150,7 +151,7 @@ class CourtFight {
   this.root.querySelector("[data-clock]").textContent=Math.ceil(this.deadline);
   this.root.querySelector("[data-round]").textContent="ROUND "+this.round+" · "+this.wins+" - "+this.enemyWins;
  }
- destroy(){this.alive=false;clearTimeout(this.pendingRound);clearTimeout(this.pendingEnd);cancelAnimationFrame(this.raf);document.removeEventListener("keydown",this.keydown,true);document.removeEventListener("keyup",this.keyup,true);window.removeEventListener("blur",this.blur);this.keys.clear();this.root.remove();}
+ destroy(){this.alive=false;clearTimeout(this.pendingRound);clearTimeout(this.pendingEnd);cancelAnimationFrame(this.raf);document.removeEventListener("keydown",this.keydown,true);document.removeEventListener("keyup",this.keyup,true);window.removeEventListener("blur",this.blur);this.keys.clear();if(this.audio){this.audio.close().catch(()=>{});this.audio=null;}this.root.remove();}
 }
 window.CourtFight=CourtFight;
 })();
