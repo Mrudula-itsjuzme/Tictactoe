@@ -202,7 +202,7 @@ function hellAI(){
  // Act I: the machine plays genuinely optimal 3x3 tic-tac-toe before revealing the rigging.
  if(n===3&&!corruptionRevealed){
   const choice=pickAI();
-  if(choice!==null)set(choice,"O");
+  if(choice!==null){set(choice,"O");scoreMachineLines();}
   return;
  }
  // Subsequent acts: reason about contiguous threats and attack opportunities.
@@ -239,15 +239,17 @@ function hellAI(){
  set(choice,"O");
  // Unlike the original implementation, the AI doesn't silently delete Xs just
  // because it has completed a line. A completed O line becomes a visible score.
- const won=match("O");
- if(won){
-  const key=won.join(",");
-  if(!awardedMachineLines.has(key)){
-   awardedMachineLines.add(key);settings.losses++;updateScore();
-   say("THE MACHINE SCORED. Its ego now requires a larger courtroom.");
-   tone(250);
-  }
+ scoreMachineLines();
+}
+function scoreMachineLines(){
+ let newlyWon=0;
+ for(const line of lines(Math.min(n,5))){
+  if(!line.every(i=>get(i)==="O"))continue;
+  const key=line.join(",");
+  if(awardedMachineLines.has(key))continue;
+  awardedMachineLines.add(key);newlyWon++;
  }
+ if(newlyWon){settings.losses+=newlyWon;updateScore();say("THE MACHINE SCORED "+newlyWon+" POINT"+(newlyWon>1?"S":"")+". THE EGO HAS GROWN.");tone(250);}
 }
 function cheat(emergency=false,lastMove=null){
   cheats++;
