@@ -29,7 +29,7 @@ The Java edition requires Java 11 or newer, a graphical desktop, and is **not** 
 | Mode | Rules | What makes it interesting |
 | --- | --- | --- |
 | **Fair play** | 3×3; first three in a row wins | Proper win/draw detection; AI never loses across all personalities |
-| **Hell** | Starts 3×3, grows to at most 10×10; five in a row on larger boards | The AI cheats, deletes moves, takes extra turns, issues fictional OS warnings, and can be challenged in court |
+| **Hell** | Starts 3×3, grows to at most 10×10; five in a row on larger boards | The AI cheats; each offense leaves evidence, and successful prosecutions block future cheats |
 
 ### Opponents
 
@@ -39,18 +39,18 @@ The Java edition requires Java 11 or newer, a graphical desktop, and is **not** 
 
 **All three personalities use perfect-play minimax with alpha-beta pruning.** They differ in attitude, never in playing strength. The human can at best draw when playing perfectly.
 
-The AI moves second. It never overwrites occupied squares in fair mode. Hell mode is **deliberately unfair** and does not promise the normal win conditions.
+The AI moves second. It never overwrites occupied squares in fair mode. Hell mode is **deliberately unfair** and does not promise the normal win conditions. Each cheating attempt produces a recorded exhibit. Prosecuting an exhibit requires selecting the correct charge; each guilty verdict awards two single-use protective injunctions. Three guilty verdicts, five clues, and the 10×10 board unlock the final terminal ending.
 
 ## Hidden story and endings
 
-Hell mode contains five collectible clues, a corrupt courtroom, a fictional terminal, and two endings.
+Hell mode contains five collectible clues, an evidence-based courtroom, a fictional terminal, and two endings.
 
 <details>
 <summary>Show spoiler: how to unlock the endings</summary>
 
 1. Play Hell mode until the board expands to 10×10.
 2. Collect all five clues, one for each five player moves.
-3. Open **Courtroom** and choose **Expose the judge**.
+3. Catch the AI cheating, then open **Courtroom**. Match each evidence report to the correct charge (illegal board expansion, extra turn, or erased marks). Win **three guilty verdicts**. Each guilty verdict earns two injunction charges that block future cheating attempts.
 4. Open **Terminal** and enter `who_makes_the_rules`.
 5. Choose **Delete the rules** or **Become the AI**.
 
@@ -61,7 +61,8 @@ All terminal commands and operating-system alerts are **fictional in-game intera
 
 - Responsive layout for phones, tablets and desktops.
 - Click or keyboard-activate square buttons; descriptive accessible labels, focus indicators, and live status messages.
-- Scoreboard, opponent level, mode and optional sound effects persisted in browser local storage.
+- Scoreboard, opponent personality, mode and optional sound effects persisted in browser local storage.
+- A persistent-in-round courtroom docket tracks evidence, verdicts and anti-cheat injunctions, with real consequences for incorrect accusations.
 - Reduced-motion preference respected; audio disabled by default.
 - No external JavaScript, trackers, accounts, cookies or API keys.
 - Restart the round or reset the scoreboard at any time.
