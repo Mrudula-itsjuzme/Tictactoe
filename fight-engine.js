@@ -9,7 +9,12 @@ class FightEngine{
   this.elapsed=0;this.enemyState="approach";this.enemyTimer=.6;this.attackId=0;this.attacks=0;this.last=0;this.raf=0;this.focus=document.activeElement;
   this.canvas=document.createElement("div");this.canvas.className="realtime-duel";this.canvas.tabIndex=0;this.canvas.setAttribute("role","application");this.canvas.setAttribute("aria-label","Real-time courtroom fight. A and D move, W jumps, J attacks, K heavy attacks, L blocks, Space dodges.");
   this.canvas.innerHTML='<div class="fight-head"><div class="fight-side"><b>THE HUMAN</b><div class="fight-meter"><i id="fight-human-hp"></i></div><span id="fight-human-text"></span></div><strong class="fight-level">COURTROOM FIGHT<br>LEVEL '+level+'</strong><div class="fight-side"><b>COUNSEL O.S.</b><div class="fight-meter hostile"><i id="fight-bot-hp"></i></div><span id="fight-bot-text"></span></div></div><div class="fight-announcer" aria-live="polite">THE DEFENSE HAS CHALLENGED YOU.</div><div class="fight-floor"><div class="fighter human"><div class="fighter-body"></div><div class="fighter-name">YOU</div></div><div class="fighter ai"><div class="fighter-body"></div><div class="fighter-name">COUNSEL O.S.</div></div><div class="fight-warning"></div></div><div class="fight-help">A/D MOVE · W JUMP · J STRIKE · K HEAVY · L GUARD · SPACE DODGE · P PAUSE</div><div class="fight-touch"><button data-key="a" aria-label="Move left">◀</button><button data-key="d" aria-label="Move right">▶</button><button data-key="w">JUMP</button><button data-key="j">HIT</button><button data-key="k">HEAVY</button><button data-key="l">BLOCK</button><button data-key=" ">DODGE</button></div>';
-  arena.append(this.canvas);this.humanEl=this.canvas.querySelector(".fighter.human");this.botEl=this.canvas.querySelector(".fighter.ai");this.announcer=this.canvas.querySelector(".fight-announcer");this.warning=this.canvas.querySelector(".fight-warning");
+  arena.append(this.canvas);this.humanEl=this.canvas.querySelector(".fighter.human");this.botEl=this.canvas.querySelector(".fighter.ai");
+ for(const fighter of [this.humanEl,this.botEl]){
+  const body=fighter.querySelector(".fighter-body");
+  body.innerHTML='<div class="fighter-hair"></div><div class="fighter-head"><i class="fighter-eye"></i></div><div class="fighter-torso"></div><div class="fighter-arm near"></div><div class="fighter-arm far"></div><div class="fighter-leg near"></div><div class="fighter-leg far"></div><div class="fighter-aura"></div>';
+ }
+ this.combo=0;this.lastHit=0;this.announcer=this.canvas.querySelector(".fight-announcer");this.warning=this.canvas.querySelector(".fight-warning");
   this.keydown=e=>{const k=e.key.toLowerCase();if(["a","d","w","j","k","l"," ","arrowleft","arrowright","arrowup","p"].includes(k)){e.preventDefault();e.stopPropagation();if(k==="p"&&!e.repeat){this.paused=!this.paused;this.announce(this.paused?"PAUSED · PRESS P":"FIGHT!");return;}this.keys.add(k);if(k==="j"&&!e.repeat)this.attack("light");if(k==="k"&&!e.repeat)this.attack("heavy");if(k===" "&&!e.repeat)this.dodge();if((k==="w"||k==="arrowup")&&!e.repeat)this.jump();}};
   this.keyup=e=>{this.keys.delete(e.key.toLowerCase());};
   this.blurred=()=>{this.keys.clear();this.paused=true;this.announce("PAUSED · PRESS P TO RESUME");};
@@ -20,8 +25,15 @@ class FightEngine{
  announce(text){this.announcer.textContent=text;}
  jump(){const p=this.player;if(p.y===0&&p.stun<=0){p.velocity=54;p.action="jump";}}
  dodge(){const p=this.player;if(p.cool>0||p.stun>0||p.inv>0)return;p.inv=.55;p.cool=.48;p.x=clamp(p.x+p.facing*15,7,93);p.action="dodge";this.announce("PERFECT DODGE WINDOW!");}
- attack(kind){const p=this.player;if(this.paused||!this.live||p.cool>0||p.stun>0)return;const heavy=kind==="heavy";p.cool=heavy?.8:.34;p.action=kind;p.facing=Math.sign(this.bot.x-p.x)||1;const delay=heavy?220:85;const attackNumber=++this.attackId;setTimeout(()=>{if(!this.live||this.paused||attackNumber!==this.attackId)return;const b=this.bot;const reach=heavy?21:15;if(Math.abs(p.x-b.x)>reach||p.y>20){this.announce("WHIFF! GET CLOSER.");return;}const dmg=heavy?27:13;const actual=b.guard&&!heavy?Math.ceil(dmg*.2):dmg;b.hp=clamp(b.hp-actual,0,b.max);b.stun=heavy?.48:.17;b.x=clamp(b.x+p.facing*(heavy?6:3),7,93);this.announce((heavy?"HEAVY BREAK":"STRIKE")+" · "+actual+" DAMAGE");this.flash(this.botEl);if(b.hp<=0)this.finish(true);},delay);}
- flash(el){el.classList.remove("damaged");void el.offsetWidth;el.classList.add("damaged");}
+ attack(kind){const p=this.player;if(this.paused||!this.live||p.cool>0||p.stun>0)return;const heavy=kind==="heavy";p.cool=heavy?.8:.34;p.action=kind;p.facing=Math.sign(this.bot.x-p.x)||1;const delay=heavy?220:85;const attackNumber=++this.attackId;setTimeout(()=>{if(!this.live||this.paused||attackNumber!==this.attackId)return;const b=this.bot;const reach=heavy?21:15;if(Math.abs(p.x-b.x)>reach||p.y>20){this.announce("WHIFF! GET CLOSER.");return;}const dmg=heavy?27:13;const actual=b.guard&&!heavy?Math.ceil(dmg*.2):dmg;b.hp=clamp(b.hp-actual,0,b.max);b.stun=heavy?.48:.17;b.x=clamp(b.x+p.facing*(heavy?6:3),7,93);this.combo=(performance.now()-this.lastHit<1800)?this.combo+1:1;this.lastHit=performance.now();this.announce((heavy?"HEAVY BREAK":"STRIKE")+" · "+actual+" DAMAGE"+(this.combo>1?" · "+this.combo+" HIT COMBO!":""));this.flash(this.botEl);this.visualAttack(this.humanEl,heavy);if(b.hp<=0)this.finish(true);},delay);}
+ visualAttack(el,heavy){
+  const cls=heavy?"heavy-swing":"fast-swing";
+  el.classList.remove("fast-swing","heavy-swing");void el.offsetWidth;el.classList.add(cls);
+  const spark=document.createElement("span");spark.className="combat-spark";spark.textContent=heavy?"✦":"✕";
+  spark.style.left=el.style.left;spark.style.bottom="31%";this.canvas.querySelector(".fight-floor").append(spark);
+  setTimeout(()=>{spark.remove();el.classList.remove(cls);},340);
+ }
+  flash(el){el.classList.remove("damaged");void el.offsetWidth;el.classList.add("damaged");}
  aiAction(){const p=this.player,b=this.bot,dist=Math.abs(p.x-b.x);if(b.stun>0||this.paused)return;const approaching=dist>17;
  if(approaching){b.guard=false;b.x+=Math.sign(p.x-b.x)*(7+this.level*.6)*.28;this.enemyState="approach";this.enemyTimer=.15;return;}
  const choices=["strike","guard","heavy","strike","dodge"];
@@ -40,7 +52,7 @@ class FightEngine{
  setTimeout(()=>{if(!this.live||this.paused)return;this.warning.classList.remove("active");if(Math.abs(p.x-b.x)>(heavy?19:15)||p.inv>0||p.y>17){this.announce("ENEMY MISSED!");return;}
  const power=heavy?19+this.level*3:9+this.level*2;
  const damage=this.keys.has("l")?Math.ceil(power*.15):power;
- p.hp=clamp(p.hp-damage,0,p.max);p.stun=this.keys.has("l")?0:.2;p.x=clamp(p.x+Math.sign(p.x-b.x)*4,7,93);this.announce(this.keys.has("l")?"BLOCKED · "+damage+" CHIP DAMAGE":"HIT! −"+damage+" HP");this.flash(this.humanEl);if(p.hp<=0)this.finish(false);
+ p.hp=clamp(p.hp-damage,0,p.max);p.stun=this.keys.has("l")?0:.2;p.x=clamp(p.x+Math.sign(p.x-b.x)*4,7,93);this.announce(this.keys.has("l")?"BLOCKED · "+damage+" CHIP DAMAGE":"HIT! −"+damage+" HP");this.flash(this.humanEl);this.visualAttack(this.botEl,heavy);if(p.hp<=0)this.finish(false);
  },hitDelay);
  this.enemyTimer=heavy?1.35:.95;
  }
@@ -57,7 +69,7 @@ class FightEngine{
  }
  this.render();this.raf=requestAnimationFrame(x=>this.frame(x));
  }
- render(){const p=this.player,b=this.bot;this.humanEl.style.left=p.x+"%";this.botEl.style.left=b.x+"%";this.humanEl.style.bottom=(13+p.y)+"%";this.humanEl.style.transform="translateX(-50%) scaleX("+p.facing+")";this.botEl.style.transform="translateX(-50%) scaleX("+b.facing+")";this.humanEl.classList.toggle("blocking",p.guard);this.botEl.classList.toggle("blocking",b.guard);this.humanEl.classList.toggle("dodging",p.inv>0);
+ render(){const p=this.player,b=this.bot;this.humanEl.style.left=p.x+"%";this.botEl.style.left=b.x+"%";this.humanEl.style.bottom=(13+p.y)+"%";this.humanEl.style.transform="translateX(-50%) scaleX("+p.facing+")";this.botEl.style.transform="translateX(-50%) scaleX("+b.facing+")";this.humanEl.classList.toggle("blocking",p.guard);this.botEl.classList.toggle("blocking",b.guard);this.humanEl.classList.toggle("dodging",p.inv>0);this.humanEl.classList.toggle("airborne",p.y>2);this.humanEl.classList.toggle("walking",this.keys.has("a")||this.keys.has("d")||this.keys.has("arrowleft")||this.keys.has("arrowright"));this.botEl.classList.toggle("walking",this.enemyState==="approach");
  this.canvas.querySelector("#fight-human-hp").style.width=100*p.hp/p.max+"%";this.canvas.querySelector("#fight-bot-hp").style.width=100*b.hp/b.max+"%";this.canvas.querySelector("#fight-human-text").textContent=Math.ceil(p.hp)+" HP";this.canvas.querySelector("#fight-bot-text").textContent=Math.ceil(b.hp)+" HP";
  }
  finish(win){if(this.finished)return;this.finished=true;this.live=false;this.announce(win?"KNOCKOUT! YOU WON THE DUEL.":"THE DEFENSE WINS THIS ROUND.");this.keys.clear();this.cleanupInputs();setTimeout(()=>{if(this.canvas.isConnected)this.onEnd(win);},950);}
