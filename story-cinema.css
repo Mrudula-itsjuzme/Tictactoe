@@ -63,3 +63,16 @@
 @keyframes artTremor{0%,100%{translate:0 0}24%{translate:-4px 1px}48%{translate:4px -1px}70%{translate:-1px 3px}}
 @media(max-width:650px){.story-cinema.has-story-art .story-banner h2{font-size:clamp(1.25rem,5vw,2rem)}.story-cinema.has-story-art .story-artwork img{object-position:center}.story-artwork:after{background:linear-gradient(180deg,#0d0719be,transparent 22%,#0d0812ba 65%,#0b0715f4)}}
 @media(prefers-reduced-motion:reduce){.story-artwork img,.story-cinema.has-story-art.story-machine .story-artwork img{transition:none!important;animation:none!important;transform:none!important}}
+
+
+/* Motion picture layer: authored from original generated chapter illustrations. */
+.story-artwork .story-clip{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;opacity:0;z-index:1;pointer-events:none;filter:saturate(1.1) contrast(1.04)}
+.story-cinema.has-story-video .story-clip{opacity:1}
+.story-cinema.has-story-video .story-artwork img{opacity:0}
+.story-artwork:after{z-index:2}
+.story-cinema.has-story-video .story-portraits{visibility:hidden}
+.story-cinema.has-story-video .story-portraits strong{visibility:visible}
+.story-cinema.has-story-video .story-banner{z-index:3}
+.story-cinema.has-story-video .story-banner h2{font:italic 900 clamp(1.3rem,3.1vw,3.2rem)/1.06 Georgia,serif;color:#fff3e6;text-shadow:0 2px 14px #0a0414,2px 3px #6a2144}
+.story-cinema.has-story-video .story-top,.story-cinema.has-story-video .story-dialog{position:relative;z-index:4;background:#160d22ed}
+@media(prefers-reduced-motion:reduce){.story-artwork .story-clip{display:none!important}}
