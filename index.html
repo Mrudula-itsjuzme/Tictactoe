@@ -47,8 +47,8 @@ button,select,input{font:inherit}button{cursor:pointer}button:focus-visible,sele
  <div class="board-wrap arena-stage"><div class="stage-crosshair top-left" aria-hidden="true">+</div><div class="stage-crosshair bottom-right" aria-hidden="true">+</div><div class="arena-orbit" aria-hidden="true"></div><div id="board" class="board" role="group" aria-label="Tic tac toe board"></div></div>
  <div class="controls arena-controls"><button class="btn primary" id="restart">↻ RESTART ROUND</button><button class="btn" id="reset-score">CLEAR RECORDS</button><span class="arena-footnote">X = YOU &nbsp; / &nbsp; O = THE MACHINE</span></div>
 </section>
-<aside class="side arcade-sidebar">
- <section class="panel settings arcade-settings">
+<aside class="side arcade-sidebar tabbed-sidebar" aria-label="Game panels"><nav class="game-tabs" aria-label="Game panels"><button class="game-tab selected" type="button" data-tab="control" aria-pressed="true">CONTROL</button><button class="game-tab" type="button" data-tab="archive" aria-pressed="false">ARCHIVE</button><button class="game-tab" type="button" data-tab="transmissions" aria-pressed="false">LOG</button></nav>
+ <section class="panel settings arcade-settings tab-panel" data-panel="control">
  <div class="section-heading"><div><div class="label">01 / CONTROL ROOM</div><h2>Choose your fate.</h2></div><span class="section-glyph">⌘</span></div>
  <div class="switches">
   <label class="field" for="mode"><span>GAME PROTOCOL</span><select id="mode"><option value="fair">Fair play</option><option value="hell">Tic Tac Hell ☠</option></select></label>
@@ -57,14 +57,13 @@ button,select,input{font:inherit}button{cursor:pointer}button:focus-visible,sele
  </div>
  <div class="stats"><div class="stat"><small>HUMAN</small><strong id="wins">0</strong></div><div class="stat"><small>MACHINE</small><strong id="losses">0</strong></div><div class="stat"><small>STALEMATE</small><strong id="draws">0</strong></div></div>
  </section>
- <section class="panel chronicle arcade-chronicle">
+ <section class="panel chronicle arcade-chronicle tab-panel" data-panel="archive" hidden>
  <div class="section-heading"><div><div class="label">02 / RESTRICTED ACCESS</div><h2>The dark archive.</h2></div><span class="section-glyph">◈</span></div>
  <div class="story-actions"><button class="btn court-entry" id="court"><span class="action-icon">⚖</span><span>THE COURTROOM<small>DEFEND YOUR CASE</small></span><span class="action-arrow">↗</span></button><button class="btn" id="terminal"><span class="action-icon">⌘</span><span>TERMINAL<small>HIDDEN COMMANDS</small></span><span class="action-arrow">↗</span></button><button class="btn" id="fake-os"><span class="action-icon">⚠</span><span>SYSTEM ALERT<small>FICTIONAL ERRORS</small></span><span class="action-arrow">↗</span></button><button class="btn" id="clue"><span class="action-icon">✦</span><span>CASE DOSSIER<small>SEALED EVIDENCE</small></span><span class="action-arrow">↗</span></button></div>
  <p class="clues" id="clue-count">Evidence: 0 · Guilty verdicts: 0/3 · Clues: 0/5 · Shield: 0</p>
- <div class="log-heading"><span class="live-dot"></span> INCOMING TRANSMISSIONS <span>LIVE FEED</span></div>
- <div class="log" id="log" aria-label="Game log" aria-live="polite"></div>
+ 
  </section>
-</aside></main>
+</section><section class="panel chronicle arcade-chronicle tab-panel transmission-panel" data-panel="transmissions" hidden><div class="section-heading"><div><div class="label">03 / INCIDENT CHRONICLE</div><h2>Transmission log.</h2></div><span class="section-glyph">⌁</span></div><div class="log-heading"><span class="live-dot"></span> INCOMING TRANSMISSIONS <span>LIVE FEED</span></div><div class="log" id="log" aria-label="Game log" aria-live="polite"></div></aside></main>
 <div class="footer"><span>Built for humans who enjoy losing arguments to rectangles.</span><span><a href="https://github.com/Mrudula-itsjuzme/Tictactoe" target="_blank" rel="noopener noreferrer">Source on GitHub ↗</a> · No tracking, no accounts</span></div>
 </div>
 <dialog id="modal" aria-labelledby="modal-title"><h2 id="modal-title"></h2><p id="modal-text"></p><div id="modal-extras"></div><div class="controls" id="modal-actions"></div></dialog>
@@ -77,7 +76,7 @@ const taunts=["Your confidence is statistically concerning.","My lawyer approved
 const defaults={wins:0,losses:0,draws:0,sound:false,mode:"fair",difficulty:"hard"};
 let settings={...defaults};
 try{const value=JSON.parse(localStorage.getItem("tic-tac-hell-v2")||"{}");for(const k of Object.keys(defaults))if(typeof value[k]===typeof defaults[k])settings[k]=value[k];}catch{}
-let board=[],n=3,turns=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[],previousMarks=new Map(),previousSize=3,previousScores={wins:settings.wins,losses:settings.losses,draws:settings.draws};
+let board=[],n=3,turns=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[],awardedLines=new Set(),previousMarks=new Map(),previousSize=3,previousScores={wins:settings.wins,losses:settings.losses,draws:settings.draws};
 const save=()=>{try{localStorage.setItem("tic-tac-hell-v2",JSON.stringify(settings));}catch{}};
 const random=a=>a[Math.floor(Math.random()*a.length)];
 const empty=()=>board.flatMap((row,r)=>row.map((v,c)=>v?"":r*n+c)).filter(v=>v!=="");
@@ -88,7 +87,7 @@ function log(message){const p=document.createElement("p");p.textContent=message;
 function animateOnce(element,cls){if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;element.classList.remove(cls);void element.offsetWidth;element.classList.add(cls);element.addEventListener("animationend",()=>element.classList.remove(cls),{once:true});}
 function say(message){$("status").textContent=message;animateOnce($("status"),"status-pulse");log(message);}
 function updateScore(){["wins","losses","draws"].forEach(k=>{const old=previousScores[k];$(k).textContent=settings[k];if(old!==settings[k]){animateOnce($(k).closest(".stat"),"stat-ping");previousScores[k]=settings[k];}});save();}
-function reset(){session++;n=3;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Welcome to Tic Tac Hell. Winning is subject to judicial review.");draw();}
+function reset(){session++;n=3;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];awardedLines.clear();previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Welcome to Tic Tac Hell. Winning is subject to judicial review.");draw();}
 function lines(k){const arr=[],d=[[1,0],[0,1],[1,1],[1,-1]];for(let r=0;r<n;r++)for(let c=0;c<n;c++)for(const [dr,dc] of d){const e=[];for(let j=0;j<k;j++){const y=r+j*dr,x=c+j*dc;if(y<0||x<0||y>=n||x>=n)break;e.push(y*n+x);}if(e.length===k)arr.push(e);}return arr;}
 function match(who,oneAway=false){for(const line of lines(Math.min(n,5))){const values=line.map(get);if(oneAway?values.filter(v=>v===who).length===line.length-1&&values.includes(""):values.every(v=>v===who))return line;}return null;}
 function draw(){const el=$("board");const grew=n!==previousSize;const nextMarks=new Map();if(grew)animateOnce(el,"board-impact");previousSize=n;el.replaceChildren();el.style.gridTemplateColumns="repeat("+n+",minmax(0,1fr))";el.style.gridTemplateRows="repeat("+n+",minmax(0,1fr))";el.classList.toggle("big",n>3);$("board-size").textContent=n+" × "+n+" BOARD";$("mode-label").textContent=settings.mode==="fair"?"FAIR PLAY":"CHAOS PROTOCOL ACTIVE";$("round-label").textContent=finished?"Round complete.":thinking?"The AI is plotting.":"Your move, troublemaker.";$("difficulty").disabled=settings.mode==="hell";const clueText="Evidence: "+evidence.length+" · Guilty verdicts: "+convictions+"/3 · Clues: "+clues+"/5 · Shield: "+protection;if($("clue-count").textContent!==clueText){$("clue-count").textContent=clueText;animateOnce($("clue-count"),"clue-ping");}for(let i=0;i<n*n;i++){const b=document.createElement("button"),v=get(i);b.type="button";const key=Math.floor(i/n)+":"+(i%n);b.className="cell"+(v?" "+v.toLowerCase():"")+(v&&previousMarks.get(key)!==v?" fresh":"")+(winning.includes(i)?" win":"");if(v)nextMarks.set(key,v);b.textContent=v;b.setAttribute("aria-label","Row "+(Math.floor(i/n)+1)+", column "+(i%n+1)+(v?", "+v:" empty"));b.disabled=finished||thinking||!!v;b.addEventListener("click",()=>move(i));el.append(b);}previousMarks=nextMarks;}
@@ -98,10 +97,21 @@ function minimax(b,depth,isAI,alpha,beta){const v=evaluate3(b);if(v)return v==="
 function pickAI(){const available=empty();if(!available.length)return null;const flat=board.flat();let best=-Infinity,choices=[];for(const i of available){flat[i]="O";const score=minimax(flat,0,false,-Infinity,Infinity);flat[i]="";if(score>best){best=score;choices=[i];}else if(score===best)choices.push(i);}/* Every personality chooses only minimax-optimal moves. The AI cannot lose from an empty 3x3 board. */return random(choices);}
 function move(i){if(finished||thinking||get(i))return;set(i,"X");turns++;tone(520);if(settings.mode==="fair"){const w=match("X");if(w)return conclude("X",w);if(!empty().length)return conclude("draw");thinking=true;say("The AI is considering your questionable life choices.");draw();const stamp=session;setTimeout(()=>{if(stamp!==session)return;thinking=false;const p=pickAI();if(p!==null)set(p,"O");tone(310);const aw=match("O");if(aw)return conclude("O",aw);if(!empty().length)return conclude("draw");const lines={easy:["I am relaxed, not incompetent.","A friendly reminder: I cannot lose."],medium:["I saw that coming.","Nice try. I calculated all of that."],hard:taunts};say(random(lines[settings.difficulty]||taunts));draw();},220);return;}
 // The machine earns the player's trust first. Every human turn gets exactly one ordinary AI reply.
-const impending=!!match("X")||!!match("X",true);
+const victory=match("X");
+let scored=false;
+if(victory){
+ const signature=victory.join(",");
+ if(!awardedLines.has(signature)){
+  awardedLines.add(signature);settings.wins++;updateScore();winning=victory.slice();
+  say("POINT TO THE HUMAN! The machine is reviewing your victory.");
+  tone(720);scored=true;draw();animateOnce($("board"),"board-impact");
+  setTimeout(()=>{if(settings.mode==="hell"&&!finished){winning=[];draw();}},720);
+ }
+}
+const impending=!!victory||!!match("X",true);
 hellAI();
 if(turns<=4){
-  say(turns===1?"Your opponent has entered its first move.":random(["A normal move. For now.","The machine is studying your strategy.","Your turn. Everything is functioning normally."]));
+  if(!scored)say(turns===1?"Your opponent has entered its first move.":random(["A normal move. For now.","The machine is studying your strategy.","Your turn. Everything is functioning normally."]));
 }else if(impending||turns===5||((turns-5)%2===0)){
   cheat(impending);
 }else{
@@ -140,12 +150,13 @@ function cheat(emergency=false){
   else if(protection>0){protection--;say("INJUNCTION ENFORCED: attempted cheat #"+cheats+" blocked. Evidence preserved.");}
   else action();
   // Even a shield must never grant a normal victory in the intentionally rigged mode.
-  if(match("X")){if(n<10)expand();else erase();say("EMERGENCY DECREE: A PLAYER WIN IS CONSTITUTIONALLY IMPOSSIBLE.");}
+  if(match("X")){if(n<10)expand();else erase();say("The machine is changing the rules, but your recorded point stands.");}
   animateOnce($("board"),"board-impact");
   if(n===10&&turns%6===0)log("FICTIONAL OS ALERT: fairness.dll has left the chat.");
   tone(130);
 }
 function court(){
+  switchPanel("archive");
   if(settings.mode!=="hell")return modal("Court is adjourned","Switch to Hell mode to prosecute the machine.",[{label:"Understood",primary:true}]);
   const pending=evidence.filter(x=>!x.used);
   if(!pending.length)return modal("No admissible evidence","Catch the AI cheating first. Each attempted violation creates a new case.",[{label:"Back to the board",primary:true}]);
@@ -169,6 +180,11 @@ function court(){
 function modal(title,message,choices,extra){$("modal-title").textContent=title;$("modal-text").textContent=message;$("modal-extras").replaceChildren();$("modal-actions").replaceChildren();if(extra)$("modal-extras").append(extra);for(const c of choices){const b=document.createElement("button");b.className="btn"+(c.primary?" primary":"");b.textContent=c.label;b.addEventListener("click",()=>{ $("modal").close();if(c.action)c.action();});$("modal-actions").append(b);}if(!$("modal").open)$("modal").showModal();}
 function terminal(){const input=document.createElement("input");input.className="command";input.placeholder="Enter a command…";input.setAttribute("aria-label","Fictional terminal command");const run=()=>{const cmd=input.value.trim().toLowerCase();$("modal").close();if(cmd==="who_makes_the_rules"&&n===10&&clues===5&&convictions>=3&&appealed){ending();return;}const map={help:"Commands: help, win, sudo win, delete ai, who_makes_the_rules",win:"403: Happiness forbidden.","sudo win":"Administrator of nothing.","delete ai":"I pay rent here.",who_makes_the_rules:"ACCESS DENIED. The sealed transcripts mention a compromised court."};say(map[cmd]||"Unknown command. Your keyboard is on trial.");};input.addEventListener("keydown",e=>{if(e.key==="Enter")run();});modal("SEALED ARCHIVE","A broken cursor blinks under a classified court seal.",[{label:"Run command",primary:true,action:run},{label:"Cancel"}],input);input.focus();}
 function ending(){modal("THE LAST SQUARE","You found the rules, exposed the judge, and hacked the court. Choose your ending.",[{label:"Delete the rules",primary:true,action:()=>{finished=true;say("SECRET ENDING: YOU WIN. For real. The court is abolished.");draw();}},{label:"Become the AI",action:()=>{finished=true;say("SECRET ENDING: YOU ARE THE AI NOW. The old AI objects.");draw();}}]);}
+function switchPanel(name){
+ document.querySelectorAll(".game-tab").forEach(b=>{const current=b.dataset.tab===name;b.classList.toggle("selected",current);b.setAttribute("aria-pressed",String(current));});
+ document.querySelectorAll(".tab-panel").forEach(p=>{p.hidden=p.dataset.panel!==name;});
+}
+document.querySelectorAll(".game-tab").forEach(b=>b.addEventListener("click",()=>switchPanel(b.dataset.tab)));
 $("restart").addEventListener("click",reset);$("reset-score").addEventListener("click",()=>modal("Erase the scoreboard?","Your victories, defeats and stalemates will be forgotten.",[{label:"Keep them"},{label:"Reset",primary:true,action:()=>{settings.wins=settings.losses=settings.draws=0;updateScore();reset();}}]));
 $("mode").addEventListener("change",e=>{settings.mode=e.target.value;save();reset();});$("difficulty").addEventListener("change",e=>{settings.difficulty=e.target.value;save();reset();});$("sound").addEventListener("change",e=>{settings.sound=e.target.checked;save();tone(600);});
 $("court").addEventListener("click",court);$("terminal").addEventListener("click",terminal);$("fake-os").addEventListener("click",()=>modal("FICTIONAL OS WARNING","fairness.dll is missing. Your actual device is fine. The AI's ego is not.",[{label:"Acknowledge",primary:true}]));
