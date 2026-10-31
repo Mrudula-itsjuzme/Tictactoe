@@ -133,3 +133,7 @@ The desktop game now gives the board approximately 70% of the width; the right s
 **Courtroom battle:** After charge, evidence, and rebuttal phases, a fighter-style duel begins against Defense Counsel O.S. Levels increase with convictions, HP is visible, and the rival telegraphs STRIKE, HEAVY, or GUARD. Players choose Strike, Guard or Break, with different damage and counter mechanics. A guilty verdict requires both successful evidence and a duel victory. Combat visuals are original CSS silhouettes, not footage or third-party animation packs.
 
 The terminal, dossier and alert also have distinctive transitions. Motion respects the reduced-motion setting. No new CI, build dependencies or external assets were added.
+
+## Delayed erasure and machine tantrums
+
+Hell mode renders each newly placed X before the machine takes its turn. Any illegal erasure is announced and animated on the occupied square before removal, preserving the visual cause-and-effect of the move. A human score is retained even if the machine retaliates. Winning triggers an original full-screen machine tantrum cutscene, followed by its response and potential rule-breaking. Timed responses are invalidated when a round resets, and reduced-motion preferences are respected.
