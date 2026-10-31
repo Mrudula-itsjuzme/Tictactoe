@@ -195,3 +195,9 @@ Reviewed three public MIT-licensed fighting-game repositories for patterns, with
 The fictional **sealed archive terminal** now implements the commands `help`, `status`, `cases`, `transcripts`, and `verdicts`, with late-game story conditions kept hidden. The **case dossier** shows real untried exhibits and previous verdicts. These commands never execute operating-system programs.
 
 No automated CI was added. JavaScript parsing and isolated combat math checks can validate critical paths, but complete interactive keyboard, animation, and touch behavior still requires browser gameplay testing.
+
+## Courtroom V8 and scoring integrity (2026-10-31)
+
+The machine's exaggerated score came from scanning all O lines after each move, including lines built during the fictional X-to-O corruption. The scoring system now grants **at most one legitimate point for a newly placed O**, only when that placement completes a clean three-in-a-row line. Rechecking the same move earns nothing; stolen X-to-O positions permanently disqualify any line containing those marks. Human winning moves retain one scored point each. Previously saved score totals are not altered automatically: use **Clear Records** if the old bug inflated yours.
+
+The courtroom has been rebuilt around an explicit six-stage case progression bar, stronger judicial staging, clearer dialogue and responsive portraits, with a dedicated full-height combat view when the battle begins. Combat retains the original fixed-step best-of-three engine, stamina, timed attacks, guards, dodges, opponent AI and keyboard/mobile controls. Scene graphics remain original CSS/vector art. No external sprites or clips were imported.
