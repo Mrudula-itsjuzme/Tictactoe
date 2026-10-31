@@ -52,19 +52,19 @@ startDuel(){
  this.cinematic("TRIAL BY COMBAT","A / D MOVE · W JUMP · J ATTACK · K HEAVY · L BLOCK · SPACE DODGE");
  if(!window.CourtFight){this.scene("SYSTEM","The duel could not load.",[{text:"RETURN TO COURT",go:()=>this.verdict()}]);return;}
  this.root.querySelector(".court-dialog").hidden=true;
- this.fighter=new window.CourtFight({arena:this.root.querySelector(".court-stage"),level:this.level,sound:window.__courtSound,onEnd:won=>{
+ this.fightStartTimer=setTimeout(()=>{if(this.done)return;this.fighter=new window.CourtFight({arena:this.root.querySelector(".court-stage"),level:this.level,sound:window.__courtSound,onEnd:won=>{
   if(this.done)return;
   this.battleWon=won;this.fighter?.destroy();this.fighter=null;
   this.root.querySelector(".court-dialog").hidden=false;
   this.endDuel();
- }});
+ }});},1600);
 }
 endDuel(){
  this.cinematic(this.battleWon?"KNOCKOUT!":"DEFEATED",this.battleWon?"THE HUMAN HAS DEFEATED COUNSEL O.S.":"THE DEFENSE CLAIMS THE BENCH");
  this.scene("BAILIFF KERNEL",this.battleWon?"Counsel O.S. falls. The courtroom erupts.":"The machine remains standing. Your evidence is at risk.",[{text:"RECEIVE VERDICT",go:()=>this.verdict()}]);
 }
 verdict(){this.phase("verdict");const guilty=this.battleWon&&this.ok1&&this.ok2&&this.ok3&&this.cred>=55;this.cinematic(guilty?"GUILTY!":"NOT GUILTY",guilty?"THE JURY HAS DEFIED ITS MASTER":"JUSTICE HAS BEEN OVERRULED","verdict");this.scene("JUDGE GRIDLOCK",guilty?"Against all expectations, the evidence is overwhelming. Guilty. The player is awarded two injunctions to block future cheating.":"The prosecution failed to prove its case. The defendant walks free, and this exhibit is lost.",[{text:guilty?"ENFORCE THE VERDICT":"RETURN TO THE BOARD",go:()=>{this.opts.onVerdict(guilty,{credibility:this.cred,bias:this.bias});this.close();}}]);}
-close(){if(this.done)return;this.fighter?.destroy();this.done=true;clearTimeout(this.cutsceneTimer);this.root.remove();document.body.classList.remove("court-active");active=null;this.focus?.focus?.();}
+close(){if(this.done)return;clearTimeout(this.fightStartTimer);this.fighter?.destroy();this.done=true;clearTimeout(this.cutsceneTimer);this.root.remove();document.body.classList.remove("court-active");active=null;this.focus?.focus?.();}
 }
 window.CourtDrama={open(o){if(active)return;active=new Court(o);},setSound(v){window.__courtSound=!!v;}};
 })();
