@@ -1,0 +1,87 @@
+/* TIC TAC HELL / The Arcade Edition
+   Original design system. No external assets or framework. */
+:root{--bg:#09080d;--panel:#12121d;--stroke:#343046;--white:#fff7ef;--muted:#9c93aa;--pink:#ff426f;--cyan:#7ffce2;--gold:#f9c66e;--violet:#a48aff}
+html{scroll-behavior:smooth}body{background:#08070d!important;color:var(--white);background-image:radial-gradient(ellipse at 50% -30%,#64204750,transparent 63%),linear-gradient(120deg,#0c0817,#08070d 60%,#160915)!important;font-family:Inter,ui-sans-serif,system-ui,sans-serif}
+body:not(.court-active){background-size:cover!important;animation:none!important}
+body:before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;opacity:.15;background-image:linear-gradient(#fff1 1px,transparent 1px),linear-gradient(90deg,#fff1 1px,transparent 1px);background-size:46px 46px;mask-image:linear-gradient(#000,transparent 80%)}
+.arcade-shell{max-width:1420px;padding:28px clamp(14px,3vw,54px) 60px}
+.arcade-header{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:24px;padding:10px 0 30px}
+.arcade-header .brand-mark{width:74px;height:74px;border:2px solid var(--pink);box-shadow:5px 5px 0 var(--pink),0 0 50px #fc3e7e26;transform:rotate(-5deg);display:flex;justify-content:center;align-items:center;gap:3px;background:#250e24;font-weight:1000;font-size:2rem;color:var(--cyan)}
+.brand-mark span:last-child{color:var(--pink)}
+.arcade-header .eyebrow{letter-spacing:.23em;font-size:.69rem;color:var(--gold);font-weight:850}
+.arcade-header h1{font-family:Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif;letter-spacing:.012em;font-size:clamp(3.3rem,6.6vw,6.6rem);margin:4px 0 0;line-height:.95;text-shadow:5px 7px #000}
+.arcade-header h1>span{color:var(--pink);text-shadow:0 0 36px #ff336c50}
+.arcade-header .title-dot{color:var(--gold)}
+.arcade-header .subtitle{font-size:clamp(.9rem,1.2vw,1.1rem);letter-spacing:.02em;margin-top:13px}
+.header-stamp{position:relative;align-self:center;display:flex;align-items:center;gap:9px;max-width:230px;border:1px solid #df8d636b;background:#251224;padding:15px 17px;color:var(--gold);font-size:.72rem;letter-spacing:.1em;font-weight:900;transform:rotate(2deg)}
+.header-stamp small{position:absolute;bottom:-24px;right:0;color:#8c7c8d;font-size:.6rem}
+.stamp-pulse,.live-dot{display:inline-block;width:9px;height:9px;border-radius:50%;background:var(--pink);box-shadow:0 0 15px var(--pink);animation:arcadeBeacon 2s infinite}
+@keyframes arcadeBeacon{50%{opacity:.3;box-shadow:0 0 4px var(--pink)}}
+.marquee-line{display:flex;align-items:center;justify-content:space-around;gap:26px;overflow:hidden;white-space:nowrap;border-block:1px solid #f8c66c55;background:linear-gradient(90deg,#45172c,#290f23,#45172c);padding:10px 18px;color:#ffd69d;font-size:.68rem;font-weight:900;letter-spacing:.22em;text-transform:uppercase}
+.marquee-line b{color:var(--pink);font-size:1.2rem}
+.arcade-layout{grid-template-columns:minmax(0,1.8fr) minmax(320px,.95fr);gap:18px;margin-top:22px;align-items:stretch}
+.arcade-layout .panel{background:#151321;box-shadow:none;border:1px solid #554057;border-radius:4px}
+.arcade-arena{padding:clamp(16px,2.2vw,32px);display:flex;flex-direction:column;min-width:0;overflow:hidden;position:relative}
+.arcade-arena:after{content:"ARENA / 01";position:absolute;right:-38px;top:40%;transform:rotate(90deg);font:900 .58rem system-ui;letter-spacing:.3em;color:#997e91;pointer-events:none}
+.arena-head{display:flex;align-items:center;justify-content:space-between;gap:15px;flex-wrap:wrap}
+.arcade-arena .label,.arcade-sidebar .label{color:var(--gold);font-size:.65rem;letter-spacing:.2em}
+.arena-head h2{font-size:clamp(1.2rem,2vw,1.8rem);font-weight:850;letter-spacing:-.035em;margin-top:8px}
+.board-counter{border:1px solid #fcb76c70;padding:8px 12px;font-size:.73rem;font-weight:900;letter-spacing:.1em;color:var(--gold)}
+.arcade-status{margin-top:21px;border-radius:0;border:0;border-left:4px solid var(--pink);background:linear-gradient(90deg,#3d1935,#211727);color:#ffe0e7;padding:13px 18px;min-height:52px;box-shadow:inset 0 1px #ffffff10}
+.arena-stage{position:relative;flex:1;min-height:500px;padding:34px 20px;background:radial-gradient(ellipse at center,#32203b60 0%,#1a1226 55%,#110d1b 100%);border:1px solid #463349;margin:22px 0;isolation:isolate;overflow:hidden}
+.arena-stage:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.24;background:linear-gradient(90deg,#d5ae9333 1px,transparent 1px),linear-gradient(#d5ae9333 1px,transparent 1px);background-size:28px 28px;mask-image:radial-gradient(ellipse at center,#000,transparent 75%)}
+.arena-stage .arena-orbit{position:absolute;inset:14% 22%;border:1px solid #f3ae6d1e;transform:rotate(45deg);border-radius:50%;pointer-events:none;box-shadow:0 0 70px #ff4d7233}
+.stage-crosshair{position:absolute;font:700 1.5rem monospace;color:var(--cyan);opacity:.7}
+.stage-crosshair.top-left{top:12px;left:16px}.stage-crosshair.bottom-right{bottom:12px;right:16px}
+.arcade-arena .board{position:relative;z-index:2;width:min(100%,440px);gap:11px;filter:drop-shadow(0 15px 35px #0008)}
+.arcade-arena .board.big{width:min(100%,530px);gap:4px}
+.arcade-arena .cell{border-radius:4px;border:1px solid #5d475f;background:linear-gradient(135deg,#30243e,#241b33);box-shadow:inset 0 1px #ffffff16,3px 3px 0 #100b17;font-family:Impact,Haettenschweiler,sans-serif;font-weight:900;font-size:clamp(2rem,7vw,5rem)}
+.arcade-arena .board.big .cell{font-size:clamp(.85rem,2.2vw,1.8rem)}
+.arcade-arena .cell:not(:disabled):hover{background:#48304d;border-color:var(--cyan);box-shadow:0 0 22px #82ffe444}
+.arcade-arena .cell.x{color:var(--cyan)}.arcade-arena .cell.o{color:var(--pink)}
+.arcade-arena .cell.win{border-color:var(--gold);background:#554128}
+.arena-controls{align-items:center;gap:12px}
+.arcade-layout .btn{border-radius:3px;font-weight:850;font-size:.78rem;letter-spacing:.03em;border-color:#57465b}
+.arcade-layout .btn.primary{background:var(--pink);color:#180b14;border-color:var(--pink);box-shadow:4px 4px 0 #6f1a40}
+.arcade-layout .btn.primary:hover{background:#ff7490;box-shadow:6px 6px 0 #6f1a40}
+.arena-footnote{margin-left:auto;color:#897c94;font-size:.61rem;font-weight:800;letter-spacing:.12em}
+.arcade-sidebar{gap:18px}
+.arcade-sidebar .settings,.arcade-sidebar .chronicle{padding:23px;overflow:hidden}
+.section-heading{display:flex;align-items:start;justify-content:space-between;gap:16px;margin-bottom:22px}
+.arcade-sidebar h2{font-size:1.5rem;font-weight:900;letter-spacing:-.04em;margin-top:8px}
+.section-glyph{display:grid;place-items:center;border:1px solid #74546c;width:43px;height:43px;color:var(--pink);font-size:1.7rem;background:#2a1a2a}
+.arcade-settings .switches{gap:0;margin:0}
+.arcade-settings .field{display:grid;grid-template-columns:1fr auto;align-items:center;min-height:66px;padding:10px 0;border-top:1px solid #413449;font-size:.72rem;font-weight:850;letter-spacing:.07em}
+.arcade-settings .field>span:first-child{color:#d3c0cf}
+.arcade-settings .field select{width:min(210px,100%);max-width:210px;background:#241c30;border:1px solid #5d4c62;color:#fff6ea;padding:11px;border-radius:3px;font-size:.83rem;font-weight:700;letter-spacing:0}
+.arcade-settings .field select:disabled{opacity:.43}
+.arcade-settings .sound-field{position:relative}
+.arcade-settings input[type=checkbox]{width:40px;height:22px;opacity:0;position:absolute;right:0;z-index:2;cursor:pointer}
+.toggle-decoration{grid-column:2;width:42px;height:24px;border-radius:20px;background:#463049;border:1px solid #805875;position:relative;pointer-events:none}
+.toggle-decoration:after{content:"";position:absolute;left:4px;top:4px;width:14px;height:14px;border-radius:50%;background:#b6a7b6;transition:transform .2s,background .2s}
+.sound-field input:checked+.toggle-decoration{background:#73324e;border-color:var(--pink)}.sound-field input:checked+.toggle-decoration:after{transform:translateX(18px);background:var(--pink)}
+.sound-field input:focus-visible+.toggle-decoration{outline:3px solid var(--cyan);outline-offset:4px}
+.arcade-settings .stats{margin-top:18px;gap:7px}
+.arcade-settings .stat{display:flex;flex-direction:column;align-items:center;gap:8px;padding:13px 5px;background:#20182a;border:1px solid #49374c;border-radius:2px}
+.arcade-settings .stat small{order:0;font-size:.61rem;font-weight:800;letter-spacing:.12em;color:#b9a2b5}
+.arcade-settings .stat strong{order:1;font-family:Impact,sans-serif;font-size:2.5rem;letter-spacing:.03em}
+.arcade-chronicle{display:flex;flex-direction:column}
+.arcade-chronicle .section-heading{margin-bottom:13px}
+.arcade-chronicle .story-actions{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.arcade-chronicle .story-actions button{display:flex;text-align:left;align-items:center;justify-content:space-between;gap:7px;padding:16px 10px;background:#241b30;border:1px solid #55425a;min-height:84px;border-radius:3px;transition:transform .2s,border-color .2s,background .2s}
+.arcade-chronicle .story-actions .court-entry{background:linear-gradient(125deg,#632044,#34182c);border-color:#ff6d8a}
+.arcade-chronicle .story-actions button:hover{border-color:var(--gold);background:#483049;transform:translateY(-3px)}
+.action-icon{font-size:1.3rem;color:var(--gold)}.action-arrow{align-self:start;color:var(--cyan);font-size:1rem}
+.arcade-chronicle .story-actions button>span:nth-child(2){flex:1;font-size:.7rem;font-weight:900;line-height:1.5}
+.arcade-chronicle .story-actions button small{display:block;color:#a79aac;font-size:.54rem;font-weight:700;margin-top:4px;letter-spacing:.05em}
+.arcade-chronicle .clues{font-family:ui-monospace,monospace;color:#f9c66e;background:#251b29;border-left:3px solid #f9c66e;padding:11px 12px;margin:18px 0;line-height:1.7}
+.log-heading{display:flex;align-items:center;gap:8px;color:var(--cyan);font-weight:900;font-size:.62rem;letter-spacing:.1em;margin:0 0 10px}
+.log-heading>span:last-child{margin-left:auto;color:#716e89;font-size:.55rem}.live-dot{width:7px;height:7px;background:var(--cyan);box-shadow:0 0 10px var(--cyan)}
+.arcade-chronicle .log{height:175px;border:1px solid #49374f;border-radius:0;background:#0f0d17;color:#cbc2d2;padding:15px;font-size:.75rem}
+.arcade-chronicle .log p:before{color:var(--pink)}
+.arcade-shell .footer{padding:23px 0;margin-top:8px;border-top:1px solid #5a3a51;font-size:.72rem;letter-spacing:.025em}
+.arcade-shell .footer a{color:var(--gold)}
+@media(max-width:1020px){.arcade-layout{grid-template-columns:1fr}.arcade-sidebar{display:grid;grid-template-columns:1fr 1fr}.arena-stage{min-height:440px}.arcade-header{grid-template-columns:auto 1fr}.header-stamp{display:none}}
+@media(max-width:700px){.arcade-shell{padding:14px 12px 35px}.arcade-header{gap:14px;padding-bottom:22px}.arcade-header .brand-mark{width:52px;height:52px;font-size:1.4rem}.arcade-header h1{font-size:clamp(2.7rem,11vw,5rem)}.arcade-header .eyebrow{font-size:.5rem;letter-spacing:.12em}.marquee-line{justify-content:flex-start;gap:19px;font-size:.55rem}.arcade-sidebar{display:flex}.arena-stage{min-height:330px;margin:16px 0;padding:20px 7px}.arcade-arena .board{width:min(100%,330px);gap:7px}.arcade-arena .board.big{gap:3px}.arcade-arena .cell{font-size:clamp(2rem,11vw,4rem)}.arcade-arena .board.big .cell{font-size:clamp(.8rem,4vw,1.4rem)}.arena-footnote{width:100%;margin:8px 0}.arcade-settings .field select{max-width:175px}.arcade-sidebar .settings,.arcade-sidebar .chronicle{padding:17px}.arcade-layout{margin-top:14px}}
+@media(max-width:390px){.arcade-header .brand-mark{display:none}.arcade-header{grid-template-columns:1fr}.arcade-chronicle .story-actions{grid-template-columns:1fr 1fr}.arcade-chronicle .story-actions button{padding:11px 7px}.arcade-chronicle .story-actions button>span:nth-child(2){font-size:.6rem}}
+@media(prefers-reduced-motion:reduce){.stamp-pulse,.live-dot{animation:none!important}.arcade-chronicle .story-actions button,.toggle-decoration:after{transition:none!important}}
