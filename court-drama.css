@@ -48,3 +48,12 @@ body.court-active{overflow:hidden}.theatre{position:fixed;inset:0;z-index:9999;o
 @keyframes revolveSpot{to{transform:rotate(360deg)}}@keyframes hallLights{50%{opacity:.55}}@keyframes characterEntrance{from{opacity:0;translate:-45px 20px;scale:.86}to{opacity:1;translate:0;scale:1}}@keyframes stagePulse{50%{opacity:.5;scale:1.2}}@keyframes spinBurst{to{transform:rotate(360deg)}}
 @media(max-width:650px){.court-stage{min-height:315px}.court-face{width:90px;height:120px}.court-dialog{min-height:235px}.court-line{font-size:1.1rem;min-height:75px}.court-seal{font-size:2.5rem}.court-head h2{font-size:1.7rem}.court-wrap{padding:13px}}
 @media(prefers-reduced-motion:reduce){.theatre:before,.court-stage:before,.court-center:before,.court-face,.theatre.impact .court-stage,.theatre.impact .court-dialog,.court-flash:before,.court-spot,.court-spot .spot-inner{animation:none!important}.court-spot{display:none}}
+
+
+/* Original in-repo illustrated character portraits, independently licensed with our MIT source */
+.court-face{background:#2c1431 url("assets/judge-gridlock.svg") center center/cover no-repeat!important;border:4px solid #ffce86}
+.counsel .court-face{background:#251036 url("assets/counsel-os.svg") center center/cover no-repeat!important;border-color:#fb86d4}
+.court-face:before,.court-face:after{display:none!important}
+.court-actor:has(.court-face):hover .court-face{filter:saturate(1.3) drop-shadow(0 0 18px #ff729b)}
+.court-head h2,.court-center h3{animation:wordArrival .45s cubic-bezier(.1,1,.2,1) both}
+@keyframes wordArrival{from{opacity:0;transform:translateX(-20px) skew(-7deg)}to{opacity:1;transform:none}}
