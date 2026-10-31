@@ -57,3 +57,63 @@ body.court-active{overflow:hidden}.theatre{position:fixed;inset:0;z-index:9999;o
 .court-actor:has(.court-face):hover .court-face{filter:saturate(1.3) drop-shadow(0 0 18px #ff729b)}
 .court-head h2,.court-center h3{animation:wordArrival .45s cubic-bezier(.1,1,.2,1) both}
 @keyframes wordArrival{from{opacity:0;transform:translateX(-20px) skew(-7deg)}to{opacity:1;transform:none}}
+
+
+/* v3.2: disciplined cinematics, responsive title cards, and sitewide motion */
+.court-spot{padding:clamp(14px,4vw,48px);overflow:hidden;box-sizing:border-box}
+.court-spot .spot-inner{width:min(100%,1040px);max-width:100%;min-width:0;padding:clamp(16px,3.5vw,42px);transform:none;box-sizing:border-box;overflow:hidden;outline:1px solid #ffc47755}
+.court-spot strong{display:block;max-width:100%;font:italic 900 clamp(1.8rem,6vw,5.7rem)/1.02 Impact,Haettenschweiler,"Arial Narrow Bold",sans-serif;letter-spacing:.025em;overflow-wrap:anywhere;word-break:normal;text-wrap:balance;text-align:center;hyphens:auto;text-shadow:4px 5px #6f163a}
+.court-spot small{display:block;max-width:100%;font:800 clamp(.68rem,1.25vw,1rem)/1.4 system-ui;letter-spacing:clamp(.06em,.3vw,.18em);overflow-wrap:anywhere;text-align:center}
+.court-flash{font-size:clamp(2.8rem,12vw,9rem);text-align:center;padding:5vw;overflow-wrap:anywhere}
+@keyframes cutFocusSafe{0%{opacity:0;transform:translateY(16px) scale(.92)}19%{opacity:1;transform:translateY(0) scale(1.015)}70%{opacity:1;transform:none}100%{opacity:0;transform:translateY(-8px) scale(.98)}}
+.court-spot .spot-inner{animation:cutFocusSafe 1.65s ease both}
+.theatre .court-dialog{z-index:2}.theatre .court-stage{isolation:isolate}
+@media(max-width:650px){.court-spot{padding:12px}.court-spot .spot-inner{padding:20px 13px;border-width:2px}.court-spot strong{font-size:clamp(1.6rem,9vw,3.1rem);letter-spacing:0}.court-spot small{font-size:.68rem;letter-spacing:.06em}.court-flash{font-size:clamp(2.4rem,14vw,5rem)}}
+@media(max-width:380px){.court-spot strong{font-size:1.7rem}.court-spot small{font-size:.62rem}}
+/* Interface motion language: one coherent world, not disconnected effects. */
+body:not(.court-active){background-size:130% 130%;animation:hellAmbient 18s ease-in-out infinite alternate}
+@keyframes hellAmbient{0%{background-position:0% 10%}100%{background-position:100% 85%}}
+.shell>header{animation:hellIntro .65s cubic-bezier(.2,.8,.2,1) both}
+@keyframes hellIntro{from{opacity:0;transform:translateY(-18px)}to{opacity:1;transform:none}}
+.layout>.arena{animation:hellRise .6s .08s both}.layout>.side{animation:hellRise .7s .18s both}
+@keyframes hellRise{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.arena,.settings,.chronicle{position:relative}
+.arena:before,.settings:before,.chronicle:before{content:"";pointer-events:none;position:absolute;inset:-1px;border-radius:inherit;opacity:0;transition:opacity .3s;background:linear-gradient(135deg,#ff639437,transparent 40%,#5ff3df1c);z-index:0}
+.arena:hover:before,.settings:hover:before,.chronicle:hover:before{opacity:1}
+.arena>*,.settings>*,.chronicle>*{position:relative}
+.board{transform-origin:center;transition:width .34s cubic-bezier(.16,1,.3,1),filter .18s}
+.board.board-impact{animation:hellBoardShake .4s cubic-bezier(.18,.8,.3,1)}
+@keyframes hellBoardShake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px) rotate(-.5deg)}45%{transform:translateX(5px) rotate(.5deg)}70%{transform:translateX(-2px)}}
+.cell{position:relative;overflow:hidden;will-change:transform;transition:transform .17s cubic-bezier(.2,.9,.2,1),background .2s,border-color .2s,box-shadow .2s}
+.cell.x,.cell.o{animation:hellMark .34s cubic-bezier(.14,1.6,.3,1) both}
+@keyframes hellMark{0%{opacity:.1;transform:scale(.48) rotate(-10deg);filter:blur(3px)}75%{transform:scale(1.1) rotate(3deg)}100%{opacity:1;transform:scale(1) rotate(0);filter:none}}
+.cell.x{text-shadow:0 0 16px #44f6e78f}.cell.o{text-shadow:0 0 16px #ff58ac8f}
+.cell.win{animation:hellVictory .8s ease-in-out infinite alternate!important;box-shadow:inset 0 0 25px #57f5d930,0 0 14px #58ffee55}
+@keyframes hellVictory{to{box-shadow:inset 0 0 32px #57f5d966,0 0 28px #58ffeeaa;filter:brightness(1.2)}}
+.status{transition:background .25s,border-color .25s,transform .2s}
+.status.status-pulse{animation:hellStatus .42s ease}
+@keyframes hellStatus{0%{transform:translateY(4px);filter:brightness(1.7)}100%{transform:none;filter:none}}
+.btn,.story-actions button{transition:transform .17s,box-shadow .17s,background .17s}
+.btn:not(:disabled):active,.story-actions button:not(:disabled):active{transform:translateY(2px) scale(.97)}
+.btn.primary{box-shadow:0 4px 20px #ff529436}
+.btn.primary:hover{box-shadow:0 7px 26px #ff529477}
+.story-actions button:hover{box-shadow:0 0 20px #ff629933;border-color:#ff89b2}
+.log p{animation:hellLog .32s ease both}
+@keyframes hellLog{from{opacity:0;transform:translateX(-12px)}to{opacity:1;transform:none}}
+.stat strong{display:inline-block}
+.stat.stat-ping{animation:hellScore .45s cubic-bezier(.2,1.3,.3,1)}
+@keyframes hellScore{0%{transform:scale(.86);background:#ff61852d}60%{transform:scale(1.045)}100%{transform:none;background:transparent}}
+.clues{transition:color .2s}.clues.clue-ping{animation:hellGlint .6s}
+@keyframes hellGlint{0%,100%{filter:none}45%{filter:drop-shadow(0 0 12px #ffd565);color:#fff0b5}}
+dialog[open]{animation:hellDialog .24s cubic-bezier(.2,.9,.2,1)}
+@keyframes hellDialog{from{opacity:0;transform:translateY(12px) scale(.96)}to{opacity:1;transform:none}}
+dialog::backdrop{animation:hellFade .22s ease both}
+@keyframes hellFade{from{opacity:0}to{opacity:1}}
+.field select:hover{border-color:#ff83b7}.field select{transition:border-color .2s,box-shadow .2s}.field select:focus{box-shadow:0 0 0 3px #ff7aab33}
+.court-active .theatre .court-choice{transition:transform .15s,background .15s}.court-active .theatre .court-speaker{transition:color .2s}.court-active .theatre .court-line{animation:hellDialogueIn .27s ease both}
+@keyframes hellDialogueIn{from{opacity:.1;transform:translateY(10px)}to{opacity:1;transform:none}}
+@media(prefers-reduced-motion:reduce){
+body:not(.court-active),.shell>header,.layout>.arena,.layout>.side,.board.board-impact,.cell.x,.cell.o,.cell.win,.status.status-pulse,.stat.stat-ping,.log p,.clues.clue-ping,dialog[open],dialog::backdrop,.court-active .theatre .court-line,.court-spot .spot-inner{animation:none!important}
+.cell,.board,.status,.btn,.story-actions button,.field select,.arena:before,.settings:before,.chronicle:before{transition:none!important}
+.court-spot{display:none!important}
+}
