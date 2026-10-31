@@ -136,3 +136,14 @@ dialog.alert-scene{border:2px solid #ff566d;background:#360d22;box-shadow:0 0 75
 @keyframes victoryVisit{0%{opacity:0;transform:scale(1.12)}16%,72%{opacity:1;transform:scale(1)}100%{opacity:0;transform:scale(.97)}}
 @keyframes celebrateSpin{to{transform:rotate(360deg)}}
 @media(prefers-reduced-motion:reduce){.arcade-arena .cell.scored-line,.victory-cutscene,.victory-cutscene:before{animation:none!important}.victory-cutscene{opacity:1}}
+
+
+/* Recoverable evidence archives instead of single-sentence gag dialogs. */
+.archive-console{display:grid;gap:12px;min-width:0}
+.archive-output{height:min(260px,37vh);overflow:auto;white-space:pre-wrap;overflow-wrap:anywhere;margin:0;padding:15px;background:#050f13;border:1px solid #386a69;border-radius:4px;font: .77rem/1.6 ui-monospace,SFMono-Regular,Consolas,monospace;color:#a5ffe8;text-shadow:0 0 6px #1ce2bf50}
+.archive-console .command{width:100%;background:#06151b;color:#b2ffea;border:1px solid #54cbb8;font-family:ui-monospace,monospace}
+.case-records{max-height:min(360px,47vh);overflow:auto;display:grid;gap:12px;text-align:left}
+.case-records>p{font:800 .74rem/1.5 ui-monospace,monospace;color:#ffda9b;letter-spacing:.045em}
+.case-records article{padding:12px;background:#351d31;border-left:3px solid #f3b96e;color:#f7dde2;font-size:.84rem}
+.case-records article strong{display:block;color:#ffe1a8;margin-bottom:4px;letter-spacing:.07em}
+.case-records article p{margin:0;line-height:1.55}
