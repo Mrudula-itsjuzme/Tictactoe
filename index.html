@@ -163,7 +163,7 @@ setTimeout(()=>{
       if(stamp!==session)return;
       const old=n;
       if(n<10)expand();
-      evidence.push({id:++cheats,type:"erasure",description:"The machine converted the player's X marks into its own O marks during an emergency review.",used:false,annotation:"",customTitle:"",authenticity:100,defense:null});
+      evidence.push({id:++cheats,type:"erasure",description:"The machine converted the player's X marks into its own O marks during an emergency review.",originalDescription:"The machine converted the player's X marks into its own O marks during an emergency review.",used:false,annotation:"",customTitle:"",authenticity:100,defense:null});
       say("The machine has seized your marks. Exhibit #"+cheats+" has been recorded.");
       if(old!==n)log("NOTICE: BOARD DIMENSIONS ALTERED WITHOUT PLAYER CONSENT.");
       storyBeat("witness",{onDone:()=>finishHellTurn()});
@@ -329,7 +329,7 @@ function court(){
   if(settings.mode!=="hell")return modal("Court is adjourned","Switch to Hell mode to prosecute the machine.",[{label:"Understood",primary:true}]);
   const pending=evidence.filter(x=>!x.used);
   if(!pending.length)return modal("No admissible evidence","Catch the AI cheating first. Each attempted violation creates a new case.",[{label:"Back to the board",primary:true}]);
-  const exhibit=pending[0];
+  const exhibit=pending.slice().sort((a,b)=>(b.authenticity??100)-(a.authenticity??100))[0];
   if(!window.CourtDrama)return modal("Courtroom unavailable","Scene engine failed to load. Refresh to retry.",[{label:"Close"}]);
   window.CourtDrama.setSound(settings.sound);
   const beginHearing=()=>window.CourtDrama.open({exhibit,convictions,clues,n,onVerdict:(guilty,details)=>{
@@ -341,7 +341,7 @@ function court(){
       if(convictions>=3&&clues>=5&&n===10){appealed=true;say("FINAL APPEAL UNLOCKED. The terminal recognizes your authority.");}
     }else{
       courtHistory.push({id:exhibit.id,result:"ACQUITTED",credibility:details.credibility,jury:details.jury,reason:details.reason});
-      say("CASE #"+exhibit.id+": ACQUITTED. The court has destroyed this exhibit.");
+      say("CASE #"+exhibit.id+": ACQUITTED. The ruling remains in the archive. Evidence was not enough to convict.");
     }
     draw();
     if(!storySeen.has("firstVerdict"))storyBeat("firstVerdict");
