@@ -111,3 +111,7 @@ Animations are CSS/JavaScript-driven, with no external video assets or animation
 ## 2026-10-31 gameplay revisions
 
 The public help walkthrough was removed to preserve discovery. Hell-mode board expansion is scheduled through the cheat progression instead of left entirely to chance; its AI prioritizes blocking immediate threats. The story releases sealed transcripts more quickly and gives increasingly cryptic hints through the case dossier and terminal. Court sanctions, evidence trials and the two endings are preserved. Fair mode retains non-losing minimax AI across all three personalities.
+
+## Arcade UI redesign (October 2026)
+
+The web edition now uses a completely reworked arcade-inspired layout: bold title treatment, central game arena with patterned stage and oversize board, a control room for mode/personality/audio, and a separate Dark Archive for courtroom, terminal, alerts and dossier. The redesign stays responsive, keeps all existing control IDs and game mechanics, uses only original CSS and in-repository artwork, and respects reduced-motion preferences. The entry point remains `index.html`; visual overrides live in `arcade.css`.
