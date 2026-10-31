@@ -18,7 +18,7 @@ class CourtFight {
   this.t=0;this.last=0;this.raf=0;this.accumulator=0;this.step=1/60;this.round=1;this.wins=0;this.enemyWins=0;
   this.player=this.fighter(22,100,100,1);
   this.bot=this.fighter(78,84+this.level*12,100,-1);
-  this.ai={think:0,phase:"approach",read:0,preferred:"light"};
+  this.ai={think:0,phase:"approach",read:0,guardTime:0,preferred:"light"};
   this.combo=0;this.lastConnect=-10;this.effects=[];this.deadline=85;
   this.root=document.createElement("section");this.root.className="realtime-duel fight-v2";
   this.root.tabIndex=0;this.root.setAttribute("role","group");this.root.setAttribute("aria-label","Court battle. A D movement, W jump, J jab, K heavy, U special, L block, Space dodge, P pause.");
@@ -87,6 +87,7 @@ class CourtFight {
   const p=this.player,b=this.bot,dist=Math.abs(p.x-b.x);
   if(b.stun>0||b.move||b.dodge>0)return;
   b.face=Math.sign(p.x-b.x)||1;
+  if(this.ai.guardTime>0){this.ai.guardTime=Math.max(0,this.ai.guardTime-dt);b.guard=true;return;}
   b.guard=false;
   const safe=dist>16;
   if(safe){b.x=clamp(b.x+b.face*(12+this.level*1.3)*dt,6,94);this.ai.phase="closing";return;}
@@ -96,7 +97,7 @@ class CourtFight {
   let move="light";
   if(p.guard&&b.sp>30)move="heavy";
   else if(p.move?.type==="heavy"&&b.sp>22){this.dodge(b);return;}
-  else if(b.hp<b.maxHp*.3&&b.sp>25&&this.ai.read++%3===0){b.guard=true;this.ai.think=.45;this.announce("COUNSEL BRACES FOR IMPACT");return;}
+  else if(b.hp<b.maxHp*.3&&b.sp>25&&this.ai.read++%3===0){b.guard=true;this.ai.guardTime=.55;this.ai.think=.45;this.announce("COUNSEL BRACES FOR IMPACT");return;}
   else if(b.sp>47&&this.ai.read++%4===0)move="special";
   if(!this.begin(b,move)){b.guard=true;this.ai.think=.22;}
  }
@@ -130,7 +131,7 @@ class CourtFight {
   this.paint();
   if(this.wins>=2||this.enemyWins>=2){this.finishMatch(this.wins>=2);return;}
   this.nextRoundAt=this.t;
-  this.pendingRound=setTimeout(()=>{if(!this.alive)return;this.round++;this.complete=false;this.deadline=85;this.player=this.fighter(22,100,100,1);this.bot=this.fighter(78,84+this.level*12,100,-1);this.ai.think=.8;this.combo=0;this.announce("ROUND "+this.round+" · FIGHT!");},1400);
+  this.pendingRound=setTimeout(()=>{if(!this.alive)return;this.round++;this.complete=false;this.deadline=85;this.player=this.fighter(22,100,100,1);this.bot=this.fighter(78,84+this.level*12,100,-1);this.ai.think=.8;this.ai.guardTime=0;this.combo=0;this.announce("ROUND "+this.round+" · FIGHT!");},1400);
  }
  finishMatch(win){
   this.announce(win?"FINAL KNOCKOUT · THE PROSECUTION WINS":"FINAL KNOCKOUT · THE DEFENSE WINS");
