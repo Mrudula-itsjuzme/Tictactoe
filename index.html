@@ -451,7 +451,7 @@ function switchPanel(name){
 }
 document.querySelectorAll(".game-tab").forEach(b=>b.addEventListener("click",()=>switchPanel(b.dataset.tab)));
 $("restart").addEventListener("click",reset);$("reset-score").addEventListener("click",()=>modal("Erase the scoreboard?","Your victories, defeats and stalemates will be forgotten.",[{label:"Keep them"},{label:"Reset",primary:true,action:()=>{settings.wins=settings.losses=settings.draws=0;updateScore();reset();}}]));
-$("mode").addEventListener("change",e=>{settings.mode=e.target.value;save();reset();});$("difficulty").addEventListener("change",e=>{settings.difficulty=e.target.value;save();reset();});$("sound").addEventListener("change",e=>{settings.sound=e.target.checked;save();tone(600);});
+$("mode").addEventListener("change",e=>{settings.mode=e.target.value;save();reset();if(settings.mode==="hell"&&intro.hidden)storyBeat("prologue");});$("difficulty").addEventListener("change",e=>{settings.difficulty=e.target.value;save();reset();});$("sound").addEventListener("change",e=>{settings.sound=e.target.checked;save();tone(600);});
 $("court").addEventListener("click",court);$("terminal").addEventListener("click",terminal);$("fake-os").addEventListener("click",()=>modal("FICTIONAL OS WARNING","fairness.dll is missing. Your actual device is fine. The AI's ego is not.",[{label:"Acknowledge",primary:true}]));
 $("clue").addEventListener("click",dossier);
 
@@ -463,7 +463,7 @@ function enterGame(){
  if(transitioning||intro.hidden)return;
  transitioning=true;
  const showGame=()=>{intro.hidden=true;intro.classList.remove("intro-leaving");shell.inert=false;};
- const finish=()=>{transitioning=false;($("board").querySelector("button:not(:disabled)")||$("restart")).focus();};
+ const finish=()=>{transitioning=false;($("board").querySelector("button:not(:disabled)")||$("restart")).focus();if(settings.mode==="hell"&&!storySeen.has("prologue"))storyBeat("prologue");};
  if(!reduced()&&document.startViewTransition){
    document.startViewTransition(showGame).finished.then(finish,finish);
  }else{showGame();finish();}
