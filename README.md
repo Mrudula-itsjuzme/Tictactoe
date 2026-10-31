@@ -158,3 +158,7 @@ On touchscreens, the arena exposes on-screen controls. The enemy has real health
 **Hell-mode AI update:** The opening 3×3 board uses perfect minimax. Later boards use five-in-a-row threat detection and spatial positional scoring. Completed O lines are credited to the machine rather than triggering unexplained deletion of X marks. The player also retains all earned points after a tantrum. Illegal X removal locks player input until the erasure animation completes.
 
 This is an experimental browser game: source syntax and deployment can be checked automatically, but fight balancing and full controller behavior require an interactive browser playtest.
+
+## Hidden-reveal gameplay (October 2026)
+
+Hell mode now deliberately begins as ordinary 3×3 tic-tac-toe with the same perfect-play opening as Fair mode. The first serious player threat after at least three X moves reveals the machine's secret: a cinematic tantrum followed by a visible, staggered **X-to-O conversion**. The original board is displayed before any transformation, and the machine doesn't flood it with O marks beforehand. The takeover itself creates a courtroom exhibit and can expand the board, after which AI play and later rule-breaking resume. Stolen X marks are not counted as legitimate machine victories; a completed player line still earns its human point before the theft. Timers are guarded by round session IDs to prevent old cutscenes editing a restarted round. This is a fictional, intentional rule change, not standard tic-tac-toe gameplay.
