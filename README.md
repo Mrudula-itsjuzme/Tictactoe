@@ -29,7 +29,7 @@ The Java edition requires Java 11 or newer, a graphical desktop, and is **not** 
 | Mode | Rules | What makes it interesting |
 | --- | --- | --- |
 | **Fair play** | 3×3; first three in a row wins | Proper win/draw detection; AI never loses across all personalities |
-| **Hell** | Starts 3×3, grows to at most 10×10; five in a row on larger boards | The AI cheats; each offense leaves evidence, and successful prosecutions block future cheats |
+| **Hell** | Starts 3×3, expands to at most 10×10; three consecutive marks score on every board size | The AI cheats; each offense leaves evidence, and successful prosecutions block future cheats |
 
 ### Opponents
 
@@ -130,7 +130,7 @@ The desktop game now gives the board approximately 70% of the width; the right s
 
 **Scoring:** In Hell mode, a legitimate three-in-a-row on a 3×3 grid (or the corresponding line on expanded boards) immediately earns a human point even if the machine subsequently cheats. Identical completed lines are counted only once per round. The story continues after a point, allowing both progress and narrative interference. Fair-mode win/loss/draw scoring is unchanged.
 
-**Courtroom battle:** After charge, evidence, and rebuttal phases, a fighter-style duel begins against Defense Counsel O.S. Levels increase with convictions, HP is visible, and the rival telegraphs STRIKE, HEAVY, or GUARD. **This is now a real-time keyboard-controlled fight, not a menu-based battle.** The player moves, jumps, attacks, blocks and dodges against an enemy that pursues, telegraphs strikes, adapts to blocking, and changes defensive behavior with health. A guilty verdict requires both successful evidence and a duel victory. Combat visuals are original CSS silhouettes, not footage or third-party animation packs.
+**Courtroom battle:** After charge, evidence, and rebuttal phases, a real-time best-of-three duel begins against Defense Counsel O.S. Levels increase with convictions. Combat includes a round timer, stamina, HP, attack wind-up and recovery, attack range, guard, dodge and readable enemy tells. **This is now a real-time keyboard-controlled fight, not a menu-based battle.** The player moves, jumps, attacks, blocks and dodges against an enemy that pursues, telegraphs strikes, adapts to blocking, and changes defensive behavior with health. A guilty verdict requires both successful evidence and a duel victory. Combat visuals are original CSS silhouettes, not footage or third-party animation packs.
 
 The terminal, dossier and alert also have distinctive transitions. Motion respects the reduced-motion setting. No new CI, build dependencies or external assets were added.
 
@@ -174,3 +174,24 @@ A line of **three consecutive Xs or Os** scores on every board size, including e
 ## Victory feedback upgrade
 
 Legitimate three-in-a-row scoring now triggers a highlighted winning line and a brief full-screen celebration. The machine celebrates its own scoring in pink, while the human gets a cyan victory sequence (and Hell-mode retaliation continues afterward). Fair mode also uses these win effects. New completed machine lines are credited once, and marks converted by the initial reveal remain ineligible for unearned points. A round reset cancels and removes the previous cutscene. Animations respect reduced-motion settings.
+
+## October 31 combat and archive rebuild
+
+Reviewed three public MIT-licensed fighting-game repositories for patterns, without importing any upstream source or art: [mk.js](https://github.com/mgechev/mk.js), [JavaScript-Fighting-Game](https://github.com/leogama09/JavaScript-Fighting-Game), and [js-fight-game](https://github.com/phantekzy/js-fight-game). See [THIRD_PARTY_ASSETS.md](THIRD_PARTY_ASSETS.md) for the precise provenance inventory.
+
+**Rebuilt combat core:** original browser-only, fixed-step 60 Hz simulation; best-of-three rounds with an 85-second clock per round; wind-up/active/recovery attack frames; hit range and direction checks; stamina consumption and regeneration; blocking and chip damage, guard-breaking heavies, timed dodge invulnerability, jumping, knockback, adaptive AI and escalating levels. The optional sound uses synthesized Web Audio and is off when the player disables audio. No third-party sprites, clips, sounds or frameworks are bundled.
+
+| Controls | Action |
+| --- | --- |
+| A / D (or arrows) | Move |
+| W (or up arrow) | Jump |
+| J | Fast jab |
+| K | Heavy / guard break |
+| U | Special attack (more stamina) |
+| L hold | Block |
+| Space | Dodge |
+| P | Pause / resume |
+
+The fictional **sealed archive terminal** now implements the commands `help`, `status`, `cases`, `transcripts`, and `verdicts`, with late-game story conditions kept hidden. The **case dossier** shows real untried exhibits and previous verdicts. These commands never execute operating-system programs.
+
+No automated CI was added. JavaScript parsing and isolated combat math checks can validate critical paths, but complete interactive keyboard, animation, and touch behavior still requires browser gameplay testing.
