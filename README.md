@@ -123,3 +123,13 @@ The browser experience opens on a separate cinematic title screen. Choose **Ente
 ## Natural opening and native screen transitions
 
 Hell mode now responds to each player move with an ordinary O move. The first four turns are deliberately conventional before cheat incidents begin escalating; later cheat incidents are layered on top of the normal reply. Native browser View Transitions animate the title/game switch where supported, with a simple fallback elsewhere. No third-party transition template, dependency, or additional license is required. The 10×10 grid has explicit rows and constrained cell sizes to avoid overflowing the arena.
+
+## v4: Board-first arcade and trial combat
+
+The desktop game now gives the board approximately 70% of the width; the right sidebar becomes **Control**, **Archive**, and **Log** tabs. The marquee and footer are removed during gameplay, and the 10×10 board scales inside the arena. Small screens keep the board first and allow vertical scrolling so controls remain reachable.
+
+**Scoring:** In Hell mode, a legitimate three-in-a-row on a 3×3 grid (or the corresponding line on expanded boards) immediately earns a human point even if the machine subsequently cheats. Identical completed lines are counted only once per round. The story continues after a point, allowing both progress and narrative interference. Fair-mode win/loss/draw scoring is unchanged.
+
+**Courtroom battle:** After charge, evidence, and rebuttal phases, a fighter-style duel begins against Defense Counsel O.S. Levels increase with convictions, HP is visible, and the rival telegraphs STRIKE, HEAVY, or GUARD. Players choose Strike, Guard or Break, with different damage and counter mechanics. A guilty verdict requires both successful evidence and a duel victory. Combat visuals are original CSS silhouettes, not footage or third-party animation packs.
+
+The terminal, dossier and alert also have distinctive transitions. Motion respects the reduced-motion setting. No new CI, build dependencies or external assets were added.
