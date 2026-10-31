@@ -119,3 +119,7 @@ The web edition now uses a completely reworked arcade-inspired layout: bold titl
 ## Title screen and fullscreen game (October 2026)
 
 The browser experience opens on a separate cinematic title screen. Choose **Enter the Game** to transition into a compact gameplay view using a CSS wipe. The **Title Screen** control returns to the opening screen without resetting the current game. On desktop, the game board, controls and case archive occupy a viewport-height layout with the transmission log scrolling independently. Smaller screens reflow responsively to keep controls reachable. The transition and animated splash honor reduced-motion preferences. Implemented in `two-screen.css` and `index.html` without additional dependencies.
+
+## Natural opening and native screen transitions
+
+Hell mode now responds to each player move with an ordinary O move. The first four turns are deliberately conventional before cheat incidents begin escalating; later cheat incidents are layered on top of the normal reply. Native browser View Transitions animate the title/game switch where supported, with a simple fallback elsewhere. No third-party transition template, dependency, or additional license is required. The 10×10 grid has explicit rows and constrained cell sizes to avoid overflowing the arena.
