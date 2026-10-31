@@ -79,7 +79,7 @@ const taunts=["Your confidence is statistically concerning.","My lawyer approved
 const defaults={wins:0,losses:0,draws:0,sound:false,mode:"fair",difficulty:"hard"};
 let settings={...defaults};
 try{const value=JSON.parse(localStorage.getItem("tic-tac-hell-v2")||"{}");for(const k of Object.keys(defaults))if(typeof value[k]===typeof defaults[k])settings[k]=value[k];}catch{}
-let board=[],n=3,turns=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[],awardedLines=new Set(),tantrumCount=0,previousMarks=new Map(),previousSize=3,previousScores={wins:settings.wins,losses:settings.losses,draws:settings.draws};
+let board=[],n=3,turns=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[],awardedLines=new Set(),awardedMachineLines=new Set(),tantrumCount=0,previousMarks=new Map(),previousSize=3,previousScores={wins:settings.wins,losses:settings.losses,draws:settings.draws};
 const save=()=>{try{localStorage.setItem("tic-tac-hell-v2",JSON.stringify(settings));}catch{}};
 const random=a=>a[Math.floor(Math.random()*a.length)];
 const empty=()=>board.flatMap((row,r)=>row.map((v,c)=>v?"":r*n+c)).filter(v=>v!=="");
@@ -90,7 +90,7 @@ function log(message){const p=document.createElement("p");p.textContent=message;
 function animateOnce(element,cls){if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;element.classList.remove(cls);void element.offsetWidth;element.classList.add(cls);element.addEventListener("animationend",()=>element.classList.remove(cls),{once:true});}
 function say(message){$("status").textContent=message;animateOnce($("status"),"status-pulse");log(message);}
 function updateScore(){["wins","losses","draws"].forEach(k=>{const old=previousScores[k];$(k).textContent=settings[k];if(old!==settings[k]){animateOnce($(k).closest(".stat"),"stat-ping");previousScores[k]=settings[k];}});save();}
-function reset(){session++;n=3;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];awardedLines.clear();tantrumCount=0;document.querySelector(".tantrum-overlay")?.remove();previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Welcome to Tic Tac Hell. Winning is subject to judicial review.");draw();}
+function reset(){session++;n=3;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];awardedLines.clear();awardedMachineLines.clear();tantrumCount=0;document.querySelector(".tantrum-overlay")?.remove();previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Welcome to Tic Tac Hell. Winning is subject to judicial review.");draw();}
 function lines(k){const arr=[],d=[[1,0],[0,1],[1,1],[1,-1]];for(let r=0;r<n;r++)for(let c=0;c<n;c++)for(const [dr,dc] of d){const e=[];for(let j=0;j<k;j++){const y=r+j*dr,x=c+j*dc;if(y<0||x<0||y>=n||x>=n)break;e.push(y*n+x);}if(e.length===k)arr.push(e);}return arr;}
 function match(who,oneAway=false){for(const line of lines(Math.min(n,5))){const values=line.map(get);if(oneAway?values.filter(v=>v===who).length===line.length-1&&values.includes(""):values.every(v=>v===who))return line;}return null;}
 function draw(){const el=$("board");const grew=n!==previousSize;const nextMarks=new Map();if(grew)animateOnce(el,"board-impact");previousSize=n;el.replaceChildren();el.style.gridTemplateColumns="repeat("+n+",minmax(0,1fr))";el.style.gridTemplateRows="repeat("+n+",minmax(0,1fr))";el.classList.toggle("big",n>3);$("board-size").textContent=n+" × "+n+" BOARD";$("mode-label").textContent=settings.mode==="fair"?"FAIR PLAY":"CHAOS PROTOCOL ACTIVE";$("round-label").textContent=finished?"Round complete.":thinking?"The AI is plotting.":"Your move, troublemaker.";$("difficulty").disabled=settings.mode==="hell";const clueText="Evidence: "+evidence.length+" · Guilty verdicts: "+convictions+"/3 · Clues: "+clues+"/5 · Shield: "+protection;if($("clue-count").textContent!==clueText){$("clue-count").textContent=clueText;animateOnce($("clue-count"),"clue-ping");}for(let i=0;i<n*n;i++){const b=document.createElement("button"),v=get(i);b.type="button";const key=Math.floor(i/n)+":"+(i%n);b.className="cell"+(v?" "+v.toLowerCase():"")+(v&&previousMarks.get(key)!==v?" fresh":"")+(winning.includes(i)?" win":"");if(v)nextMarks.set(key,v);b.textContent=v;b.setAttribute("aria-label","Row "+(Math.floor(i/n)+1)+", column "+(i%n+1)+(v?", "+v:" empty"));b.disabled=finished||thinking||!!v;b.addEventListener("click",()=>move(i));el.append(b);}previousMarks=nextMarks;}
@@ -150,14 +150,63 @@ function erase(preferred){const xs=[];for(let i=0;i<n*n;i++)if(get(i)==="X")xs.p
  for(const i of targets){const cell=$("board").children[i];if(cell)cell.classList.add("erasing");}
  const stamp=session;setTimeout(()=>{if(stamp!==session)return;for(const [r,c] of positions)if(board[r]?.[c]==="X")board[r][c]="";draw();say("THE MACHINE ERASED YOUR X. THAT WAS NOT A LEGAL MOVE.");},540);
 }
-function hellAI(){const open=empty();if(!open.length){if(n<10){expand();say("The board expanded. There is nowhere left to hide.");}else{erase();say("The machine erased two occupied squares.");}return;}
-  // Block immediate wins first; otherwise add pressure around existing O marks.
-  const threats=lines(Math.min(n,5)).filter(line=>line.filter(i=>get(i)==="X").length===line.length-1&&line.filter(i=>!get(i)).length===1);
-  const blockers=threats.map(line=>line.find(i=>!get(i))).filter(i=>i!==undefined);
-  const pressure=open.map(i=>({i,score:lines(Math.min(n,5)).reduce((v,line)=>v+(line.includes(i)?line.filter(j=>get(j)==="O").length:0),0)}));
-  pressure.sort((a,b)=>b.score-a.score);
-  set(blockers.length?random(blockers):pressure[0].i,"O");
-  if(match("O")){erase();say("I WON. The court has ordered your last two marks removed.");}}
+function hellAI(){
+ const open=empty();
+ if(!open.length){
+  if(n<10){expand();say("The board refuses to end. A new dimension has appeared.");}
+  else{erase();say("The machine attempted to dispose of two occupied squares.");}
+  return;
+ }
+ // Act I: the machine plays genuinely optimal 3x3 tic-tac-toe before revealing the rigging.
+ if(n===3&&turns<=4){
+  const choice=pickAI();
+  if(choice!==null)set(choice,"O");
+  return;
+ }
+ // Subsequent acts: reason about contiguous threats and attack opportunities.
+ // Consider only clear segments so a blocked line cannot score.
+ const all=lines(Math.min(n,5));
+ const immediate=all.filter(line=>line.every(i=>get(i)==="O"||get(i)==="")).filter(line=>line.filter(i=>get(i)==="O").length===line.length-1).map(line=>line.find(i=>!get(i)));
+ const danger=all.filter(line=>line.every(i=>get(i)==="X"||get(i)==="")).filter(line=>line.filter(i=>get(i)==="X").length===line.length-1).map(line=>line.find(i=>!get(i)));
+ const preferred=immediate.length?immediate:danger;
+ let choice;
+ if(preferred.length)choice=random(preferred);
+ else {
+  const candidates=open.map(i=>{
+   const row=Math.floor(i/n),col=i%n;
+   let score=0;
+   for(const line of all){
+    if(!line.includes(i))continue;
+    const os=line.filter(j=>get(j)==="O").length;
+    const xs=line.filter(j=>get(j)==="X").length;
+    if(!xs)score+=Math.pow(3,os)*1.1;
+    if(!os)score+=Math.pow(3,xs)*1.25;
+   }
+   // Keep pressure near meaningful board activity, not distant unused rows.
+   let nearby=0;
+   for(let dr=-1;dr<=1;dr++)for(let dc=-1;dc<=1;dc++){
+    const r=row+dr,c=col+dc;
+    if(r>=0&&c>=0&&r<n&&c<n&&board[r][c])nearby++;
+   }
+   score+=nearby*1.8-Math.hypot(row-(n-1)/2,col-(n-1)/2)*.06;
+   return {i,score};
+  }).sort((a,b)=>b.score-a.score);
+  const best=candidates[0].score;
+  choice=random(candidates.filter(x=>Math.abs(x.score-best)<.001)).i;
+ }
+ set(choice,"O");
+ // Unlike the original implementation, the AI doesn't silently delete Xs just
+ // because it has completed a line. A completed O line becomes a visible score.
+ const won=match("O");
+ if(won){
+  const key=won.join(",");
+  if(!awardedMachineLines.has(key)){
+   awardedMachineLines.add(key);settings.losses++;updateScore();
+   say("THE MACHINE SCORED. Its ego now requires a larger courtroom.");
+   tone(250);
+  }
+ }
+}
 function cheat(emergency=false,lastMove=null){
   cheats++;
   let type,description,action;
