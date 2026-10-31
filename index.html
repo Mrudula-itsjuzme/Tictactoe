@@ -17,6 +17,7 @@ button,select,input{font:inherit}button{cursor:pointer}button:focus-visible,sele
 @media(max-width:810px){.layout{grid-template-columns:1fr}.side{display:grid;grid-template-columns:1fr 1fr}.board-wrap{min-height:340px}.shell{padding:20px 14px 45px}}@media(max-width:560px){.side{display:flex}.arena{padding:16px}.settings,.chronicle{padding:18px}.board-wrap{min-height:300px;padding:20px 0}.cell{border-radius:12px}.pill{display:none}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
 </style>
+<link rel="stylesheet" href="court-drama.css">
 </head>
 <body><div class="shell">
 <header><div><div class="eyebrow">A game that holds a grudge · v2.0</div><h1>TIC TAC <span>HELL.</span></h1><p class="subtitle">Nine squares. Zero respect for the rules. Play fair, or challenge the world's least impartial opponent.</p></div><div class="pill">✦ 100% fictional chaos</div></header>
@@ -34,6 +35,7 @@ button,select,input{font:inherit}button{cursor:pointer}button:focus-visible,sele
 <div class="footer"><span>Built for humans who enjoy losing arguments to rectangles.</span><span><a href="https://github.com/Mrudula-itsjuzme/Tictactoe" target="_blank" rel="noopener noreferrer">Source on GitHub ↗</a> · No tracking, no accounts</span></div>
 </div>
 <dialog id="modal" aria-labelledby="modal-title"><h2 id="modal-title"></h2><p id="modal-text"></p><div id="modal-extras"></div><div class="controls" id="modal-actions"></div></dialog>
+<script src="court-drama.js"></script>
 <script>
 (() => {
 "use strict";
@@ -88,30 +90,25 @@ function cheat(){
   tone(130);
 }
 function court(){
-  if(settings.mode!=="hell")return modal("Supreme Court of Squares","The courtroom only hears cases in Hell mode.",[{label:"Understood",primary:true}]);
-  const pending=evidence.filter(e=>!e.used);
-  if(!pending.length)return modal("No admissible evidence","Catch the AI breaking a rule first. Every attempted cheat generates an evidence report. Then return to prosecute it.",[{label:"Back to the board",primary:true}]);
-  const casefile=pending[0];
-  const charges=[
-    {type:"boundary",label:"Unlawful board expansion"},
-    {type:"double",label:"Illegal extra turn"},
-    {type:"erasure",label:"Destruction of evidence"}
-  ];
-  const options=charges.map(c=>({label:c.label,primary:c.type===casefile.type,action:()=>{
-    casefile.used=true;
-    if(c.type===casefile.type){
+  if(settings.mode!=="hell")return modal("Court is adjourned","Switch to Hell mode to prosecute the machine.",[{label:"Understood",primary:true}]);
+  const pending=evidence.filter(x=>!x.used);
+  if(!pending.length)return modal("No admissible evidence","Catch the AI cheating first. Each attempted violation creates a new case.",[{label:"Back to the board",primary:true}]);
+  const exhibit=pending[0];
+  if(!window.CourtDrama)return modal("Courtroom unavailable","Scene engine failed to load. Refresh to retry.",[{label:"Close"}]);
+  window.CourtDrama.setSound(settings.sound);
+  window.CourtDrama.open({exhibit,convictions,clues,n,onVerdict:(guilty,details)=>{
+    exhibit.used=true;
+    if(guilty){
       convictions++;protection+=2;
-      courtHistory.push({id:casefile.id,result:"GUILTY",charge:c.label});
-      say("GUILTY. Exhibit #"+casefile.id+" admitted. +2 injunction charges. Verdicts: "+convictions+"/3.");
+      courtHistory.push({id:exhibit.id,result:"GUILTY",credibility:details.credibility});
+      say("CASE #"+exhibit.id+": GUILTY. Two anti-cheat injunctions awarded. "+convictions+"/3 convictions.");
       if(convictions>=3&&clues>=5&&n===10){appealed=true;say("FINAL APPEAL UNLOCKED. The terminal recognizes your authority.");}
     }else{
-      courtHistory.push({id:casefile.id,result:"ACQUITTED",charge:c.label});
-      say("ACQUITTED! Wrong charge. The judge shredded exhibit #"+casefile.id+".");
+      courtHistory.push({id:exhibit.id,result:"ACQUITTED",credibility:details.credibility});
+      say("CASE #"+exhibit.id+": ACQUITTED. The court has destroyed this exhibit.");
     }
     draw();
-  }}));
-  options.push({label:"Review later"});
-  modal("CASE #"+String(casefile.id).padStart(3,"0")+" · PEOPLE vs THE AI","Exhibit: "+casefile.description+" Select the charge that matches the actual offense. Win three cases for the court's final authority. A guilty verdict prevents two future cheats.",options);
+  }});
 }
 function modal(title,message,choices,extra){$("modal-title").textContent=title;$("modal-text").textContent=message;$("modal-extras").replaceChildren();$("modal-actions").replaceChildren();if(extra)$("modal-extras").append(extra);for(const c of choices){const b=document.createElement("button");b.className="btn"+(c.primary?" primary":"");b.textContent=c.label;b.addEventListener("click",()=>{ $("modal").close();if(c.action)c.action();});$("modal-actions").append(b);}if(!$("modal").open)$("modal").showModal();}
 function terminal(){const input=document.createElement("input");input.className="command";input.placeholder="Try: help, win, sudo win, delete ai";input.setAttribute("aria-label","Fictional terminal command");const run=()=>{const cmd=input.value.trim().toLowerCase();$("modal").close();if(cmd==="who_makes_the_rules"&&n===10&&clues===5&&convictions>=3&&appealed){ending();return;}const map={help:"Commands: help, win, sudo win, delete ai, who_makes_the_rules",win:"403: Happiness forbidden.","sudo win":"Administrator of nothing.","delete ai":"I pay rent here.",who_makes_the_rules:"LOCKED: reach 10×10, collect five clues and win three court cases."};say(map[cmd]||"Unknown command. Your keyboard is on trial.");};input.addEventListener("keydown",e=>{if(e.key==="Enter")run();});modal("Fictional terminal","This terminal is make-believe. It never executes OS commands.",[{label:"Run command",primary:true,action:run},{label:"Cancel"}],input);input.focus();}
