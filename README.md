@@ -111,3 +111,9 @@ The courtroom now features **original anime-inspired vector character art**, ful
 Why no random YouTube movie clips? YouTube's standard license and platform terms do not automatically authorize copying, editing, or rehosting footage in a game. If licensed CC BY or rights-holder-approved videos are added later, preserve author, title, source URL, exact license, modification notes and any distribution restrictions in a media attribution manifest. The game does not need third-party footage to function.
 
 Animation respects the user's reduced-motion preference. Sound effects are synthesized locally with Web Audio and remain optional.
+
+## Sitewide motion system
+
+The 2026 cinematic polish pass extends animations beyond the courtroom: new player and AI marks receive distinct pop-in effects, new board dimensions and blocked cheats trigger board reactions, updated scores pulse, status messages and incident-log entries animate, the settings and story controls respond to interaction, and dialog windows animate into view. The courtroom's full-screen cut-in typography now wraps and scales within narrow and short viewports rather than overflowing the screen. Repeated board redraws do not reanimate old marks.
+
+Animations are CSS/JavaScript-driven, with no external video assets or animation dependencies. Reduced-motion settings disable nonessential effects. All existing gameplay logic and the original Java desktop edition remain intact.
