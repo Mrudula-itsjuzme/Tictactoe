@@ -79,7 +79,7 @@ const taunts=["Your confidence is statistically concerning.","My lawyer approved
 const defaults={wins:0,losses:0,draws:0,sound:false,mode:"fair",difficulty:"hard"};
 let settings={...defaults};
 try{const value=JSON.parse(localStorage.getItem("tic-tac-hell-v2")||"{}");for(const k of Object.keys(defaults))if(typeof value[k]===typeof defaults[k])settings[k]=value[k];}catch{}
-let board=[],n=3,turns=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[],awardedLines=new Set(),awardedMachineLines=new Set(),tantrumCount=0,pendingErasure=false,corruptionRevealed=false,celebrationTimer=null,previousMarks=new Map(),previousSize=3,previousScores={wins:settings.wins,losses:settings.losses,draws:settings.draws};
+let board=[],n=3,turns=0,roundHumanPoints=0,roundMachinePoints=0,cheats=0,clues=0,appealed=false,finished=false,thinking=false,winning=[],session=0,audio=null,evidence=[],convictions=0,protection=0,courtHistory=[],awardedLines=new Set(),awardedMachineLines=new Set(),tantrumCount=0,pendingErasure=false,corruptionRevealed=false,celebrationTimer=null,previousMarks=new Map(),previousSize=3,previousScores={wins:settings.wins,losses:settings.losses,draws:settings.draws};
 const save=()=>{try{localStorage.setItem("tic-tac-hell-v2",JSON.stringify(settings));}catch{}};
 const random=a=>a[Math.floor(Math.random()*a.length)];
 const empty=()=>board.flatMap((row,r)=>row.map((v,c)=>v?"":r*n+c)).filter(v=>v!=="");
@@ -90,7 +90,7 @@ function log(message){const p=document.createElement("p");p.textContent=message;
 function animateOnce(element,cls){if(window.matchMedia("(prefers-reduced-motion: reduce)").matches)return;element.classList.remove(cls);void element.offsetWidth;element.classList.add(cls);element.addEventListener("animationend",()=>element.classList.remove(cls),{once:true});}
 function say(message){$("status").textContent=message;animateOnce($("status"),"status-pulse");log(message);}
 function updateScore(){["wins","losses","draws"].forEach(k=>{const old=previousScores[k];$(k).textContent=settings[k];if(old!==settings[k]){animateOnce($(k).closest(".stat"),"stat-ping");previousScores[k]=settings[k];}});save();}
-function reset(){session++;n=3;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];awardedLines.clear();awardedMachineLines.clear();tantrumCount=0;pendingErasure=false;corruptionRevealed=false;document.querySelector(".tantrum-overlay")?.remove();document.querySelector(".victory-cutscene")?.remove();clearTimeout(celebrationTimer);previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Your move. Three in a row wins.");draw();}
+function reset(){session++;n=3;roundHumanPoints=0;roundMachinePoints=0;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];awardedLines.clear();awardedMachineLines.clear();tantrumCount=0;pendingErasure=false;corruptionRevealed=false;document.querySelector(".tantrum-overlay")?.remove();document.querySelector(".victory-cutscene")?.remove();clearTimeout(celebrationTimer);previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Your move. Three in a row wins.");draw();}
 function lines(k){const arr=[],d=[[1,0],[0,1],[1,1],[1,-1]];for(let r=0;r<n;r++)for(let c=0;c<n;c++)for(const [dr,dc] of d){const e=[];for(let j=0;j<k;j++){const y=r+j*dr,x=c+j*dc;if(y<0||x<0||y>=n||x>=n)break;e.push(y*n+x);}if(e.length===k)arr.push(e);}return arr;}
 function match(who,oneAway=false){for(const line of lines(3)){const values=line.map(get);if(oneAway?values.filter(v=>v===who).length===line.length-1&&values.includes(""):values.every(v=>v===who))return line;}return null;}
 function draw(){const el=$("board");const grew=n!==previousSize;const nextMarks=new Map();if(grew)animateOnce(el,"board-impact");previousSize=n;el.replaceChildren();el.style.gridTemplateColumns="repeat("+n+",minmax(0,1fr))";el.style.gridTemplateRows="repeat("+n+",minmax(0,1fr))";el.classList.toggle("big",n>3);$("board-size").textContent=n+" × "+n+" BOARD";$("mode-label").textContent=settings.mode==="fair"?"FAIR PLAY":corruptionRevealed?"CHAOS PROTOCOL ACTIVE":"STANDARD MATCH";$("round-label").textContent=finished?"Round complete.":thinking?"The AI is plotting.":"Your move, troublemaker.";$("difficulty").disabled=settings.mode==="hell";const clueText="Evidence: "+evidence.length+" · Guilty verdicts: "+convictions+"/3 · Clues: "+clues+"/5 · Shield: "+protection;if($("clue-count").textContent!==clueText){$("clue-count").textContent=clueText;animateOnce($("clue-count"),"clue-ping");}for(let i=0;i<n*n;i++){const b=document.createElement("button"),v=get(i);b.type="button";const key=Math.floor(i/n)+":"+(i%n);b.className="cell"+(v?" "+v.toLowerCase():"")+(v&&previousMarks.get(key)!==v?" fresh":"")+(winning.includes(i)?" win":"");if(v)nextMarks.set(key,v);b.textContent=v;b.setAttribute("aria-label","Row "+(Math.floor(i/n)+1)+", column "+(i%n+1)+(v?", "+v:" empty"));b.disabled=finished||thinking||!!v;b.addEventListener("click",()=>move(i));el.append(b);}previousMarks=nextMarks;}
@@ -142,7 +142,7 @@ setTimeout(()=>{
  // A deliberately convincing opening: ordinary perfect-play tic-tac-toe.
  // The FIRST serious player threat, after a few moves, breaks the AI's composure.
  if(!corruptionRevealed&&turns>=3&&(victory||threat)){
-  for(const line of completed)creditHumanLine(line);
+  if(victory)creditHumanLine(victory);
   corruptionRevealed=true;tantrumCount++;
   say("ERROR. THE MACHINE IS REQUESTING AN EMERGENCY REVIEW.");
   tantrumScene(tantrumCount,()=>{
@@ -159,7 +159,7 @@ setTimeout(()=>{
   });
   return;
  }
- for(const line of completed)creditHumanLine(line);
+ if(victory)creditHumanLine(victory);
  // After the reveal, the opponent continues making real moves.
  hellAI();draw();
  setTimeout(()=>{
@@ -175,7 +175,7 @@ setTimeout(()=>{
 function creditHumanLine(line){
  const signature=line.join(",");
  if(awardedLines.has(signature))return;
- awardedLines.add(signature);settings.wins++;updateScore();winning=line.slice();draw();celebrate("X",[line]);
+ awardedLines.add(signature);roundHumanPoints++;settings.wins++;updateScore();winning=line.slice();draw();celebrate("X",[line]);
  say("THE HUMAN SCORED. THE COMPUTER REFUSES TO ACCEPT IT.");
  tone(720);
 }
@@ -235,7 +235,7 @@ function hellAI(){
  // Act I: the machine plays genuinely optimal 3x3 tic-tac-toe before revealing the rigging.
  if(n===3&&!corruptionRevealed){
   const choice=pickAI();
-  if(choice!==null){set(choice,"O");scoreMachineLines();}
+  if(choice!==null){set(choice,"O");scoreMachineMove(choice);}
   return;
  }
  // Subsequent acts: reason about contiguous threats and attack opportunities.
@@ -272,24 +272,18 @@ function hellAI(){
  set(choice,"O");
  // Unlike the original implementation, the AI doesn't silently delete Xs just
  // because it has completed a line. A completed O line becomes a visible score.
- scoreMachineLines();
+ scoreMachineMove(choice);
 }
-function scoreMachineLines(){
- const newLines=[];
- for(const line of lines(3)){
-  if(!line.every(i=>get(i)==="O"))continue;
-  const key=line.join(",");
-  if(awardedMachineLines.has(key))continue;
-  awardedMachineLines.add(key);
-  newLines.push(line);
- }
- if(!newLines.length)return;
- settings.losses+=newLines.length;
- updateScore();
- say("THE MACHINE SCORED "+newLines.length+" POINT"+(newLines.length>1?"S":"")+". IT IS INSUFFERABLY PROUD.");
- tone(250);
- draw();
- celebrate("O",newLines);
+function scoreMachineMove(moveIndex){
+ // Exactly one legitimate scoring event per move. No retrospective board-wide scans.
+ // Crucial: converted X -> O marks and board expansion are NOT machine moves.
+ if(!Number.isInteger(moveIndex)||get(moveIndex)!=="O")return;
+ const fresh=lines(3).filter(line=>line.includes(moveIndex)&&line.every(i=>get(i)==="O")&&!awardedMachineLines.has(line.join(",")));
+ if(!fresh.length)return;
+ for(const line of fresh)awardedMachineLines.add(line.join(","));
+ roundMachinePoints++;settings.losses++;updateScore();
+ say("THE MACHINE SCORED ONE POINT. COUNSEL O.S. REQUESTS A VICTORY PARADE.");
+ tone(250);draw();celebrate("O",fresh);
 }
 function cheat(emergency=false,lastMove=null){
   cheats++;
