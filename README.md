@@ -237,3 +237,12 @@ Required **original** artwork files (WebP, 1440 px wide) are:
 | The Last Square | `assets/story/act-5-last-square.webp` |
 
 Act IV reuses the courtroom scene, and both epilogues reuse the final-act artwork with their own dialogue. **Asset publishing:** this editing connection supports UTF-8 GitHub file writes, but not uploading the generated binary WebP files. A matching asset ZIP was prepared in the conversation for upload into the repository, preserving these exact paths. Until those WebP files are published, the game intentionally falls back to the original illustrated CSS scenes. No copyrighted anime/movie footage, external libraries or additional licensing obligations were introduced.
+
+## Cinematic chapter video clips
+
+Five original 4-second **muted, looping H.264 MP4** motion clips accompany the WebP chapter art at the corresponding paths:
+`assets/story/act-0-friendly-match.mp4`, `act-1-first-impossible-thing.mp4`, `act-2-hidden-witness.mp4`, `act-3-court-of-nine.mp4`, and `act-5-last-square.mp4`. They use slow cinematic push-ins derived from the original illustrations; no copyrighted movie/anime footage or external YouTube media has been copied.
+
+`story-cinema.js` now selects MP4 motion when available, retains the WebP still as fallback, stops playback when scenes close, and respects reduced-motion preferences. Both endings reuse the Act V clip; the first-verdict scene reuses Act III.
+
+**Publication requirement:** Upload the supplied ZIP preserving its `assets/story/` paths. The GitHub text-edit connector can update playback code but cannot upload these binary assets directly. Until the ZIP is committed into the repository, scenes keep their CSS/still fallback instead of displaying new clips.
