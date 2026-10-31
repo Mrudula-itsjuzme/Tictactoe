@@ -166,3 +166,7 @@ Hell mode now deliberately begins as ordinary 3×3 tic-tac-toe with the same per
 ## Courtroom art and score corrections (v6)
 
 The AI's first three-in-a-row now credits a machine point during the normal 3×3 minimax opening. Later, each newly completed O line is counted once, while the fictional X-to-O takeover still does not grant unearned machine points. The real-time courtroom battle now uses original articulated HTML/CSS characters with separate head, torso, limbs and facial details; walking legs, strike/heavy punch poses, hit sparks, and combo announcements make combat actions more legible. These are original in-repository effects, not copyrighted footage or commercial sprites.
+
+## Consistent score rule (October 31, 2026)
+
+A line of **three consecutive Xs or Os** scores on every board size, including expanded 5×5 through 10×10 boards. The prior five-in-a-row threshold after expansion was inconsistent with the opening rules and has been removed. Threat detection, human-win triggers and the AI's scoring use the same three-in-a-row target. Each completed three-cell line is credited at most once per round. Stolen marks from the initial corruption reveal cannot generate unearned machine points.
