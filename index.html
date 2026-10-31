@@ -91,17 +91,24 @@ function updateScore(){["wins","losses","draws"].forEach(k=>{const old=previousS
 function reset(){session++;n=3;board=Array.from({length:n},()=>Array(n).fill(""));turns=0;cheats=0;clues=0;appealed=false;finished=false;thinking=false;winning=[];evidence=[];convictions=0;protection=0;courtHistory=[];previousMarks.clear();previousSize=3;$("log").replaceChildren();say(settings.mode==="fair"?"Your move. The AI does not accept defeat.":"Welcome to Tic Tac Hell. Winning is subject to judicial review.");draw();}
 function lines(k){const arr=[],d=[[1,0],[0,1],[1,1],[1,-1]];for(let r=0;r<n;r++)for(let c=0;c<n;c++)for(const [dr,dc] of d){const e=[];for(let j=0;j<k;j++){const y=r+j*dr,x=c+j*dc;if(y<0||x<0||y>=n||x>=n)break;e.push(y*n+x);}if(e.length===k)arr.push(e);}return arr;}
 function match(who,oneAway=false){for(const line of lines(Math.min(n,5))){const values=line.map(get);if(oneAway?values.filter(v=>v===who).length===line.length-1&&values.includes(""):values.every(v=>v===who))return line;}return null;}
-function draw(){const el=$("board");const grew=n!==previousSize;const nextMarks=new Map();if(grew)animateOnce(el,"board-impact");previousSize=n;el.replaceChildren();el.style.gridTemplateColumns="repeat("+n+",1fr)";el.classList.toggle("big",n>3);$("board-size").textContent=n+" × "+n+" BOARD";$("mode-label").textContent=settings.mode==="fair"?"FAIR PLAY":"CHAOS PROTOCOL ACTIVE";$("round-label").textContent=finished?"Round complete.":thinking?"The AI is plotting.":"Your move, troublemaker.";$("difficulty").disabled=settings.mode==="hell";const clueText="Evidence: "+evidence.length+" · Guilty verdicts: "+convictions+"/3 · Clues: "+clues+"/5 · Shield: "+protection;if($("clue-count").textContent!==clueText){$("clue-count").textContent=clueText;animateOnce($("clue-count"),"clue-ping");}for(let i=0;i<n*n;i++){const b=document.createElement("button"),v=get(i);b.type="button";const key=Math.floor(i/n)+":"+(i%n);b.className="cell"+(v?" "+v.toLowerCase():"")+(v&&previousMarks.get(key)!==v?" fresh":"")+(winning.includes(i)?" win":"");if(v)nextMarks.set(key,v);b.textContent=v;b.setAttribute("aria-label","Row "+(Math.floor(i/n)+1)+", column "+(i%n+1)+(v?", "+v:" empty"));b.disabled=finished||thinking||!!v;b.addEventListener("click",()=>move(i));el.append(b);}previousMarks=nextMarks;}
+function draw(){const el=$("board");const grew=n!==previousSize;const nextMarks=new Map();if(grew)animateOnce(el,"board-impact");previousSize=n;el.replaceChildren();el.style.gridTemplateColumns="repeat("+n+",minmax(0,1fr))";el.style.gridTemplateRows="repeat("+n+",minmax(0,1fr))";el.classList.toggle("big",n>3);$("board-size").textContent=n+" × "+n+" BOARD";$("mode-label").textContent=settings.mode==="fair"?"FAIR PLAY":"CHAOS PROTOCOL ACTIVE";$("round-label").textContent=finished?"Round complete.":thinking?"The AI is plotting.":"Your move, troublemaker.";$("difficulty").disabled=settings.mode==="hell";const clueText="Evidence: "+evidence.length+" · Guilty verdicts: "+convictions+"/3 · Clues: "+clues+"/5 · Shield: "+protection;if($("clue-count").textContent!==clueText){$("clue-count").textContent=clueText;animateOnce($("clue-count"),"clue-ping");}for(let i=0;i<n*n;i++){const b=document.createElement("button"),v=get(i);b.type="button";const key=Math.floor(i/n)+":"+(i%n);b.className="cell"+(v?" "+v.toLowerCase():"")+(v&&previousMarks.get(key)!==v?" fresh":"")+(winning.includes(i)?" win":"");if(v)nextMarks.set(key,v);b.textContent=v;b.setAttribute("aria-label","Row "+(Math.floor(i/n)+1)+", column "+(i%n+1)+(v?", "+v:" empty"));b.disabled=finished||thinking||!!v;b.addEventListener("click",()=>move(i));el.append(b);}previousMarks=nextMarks;}
 function conclude(who,line){finished=true;winning=line||[];if(who==="X"){settings.wins++;say("YOU WIN. The squares applaud. Reluctantly.");tone(700);}else if(who==="O"){settings.losses++;say("AI wins. It will never be humble about this.");tone(190);}else{settings.draws++;say("A draw. A ceasefire with nine squares.");tone(390);}updateScore();draw();}
 function evaluate3(cells){const wins=[[0,1,2],[3,4,5],[6,7,8],[0,3,6],[1,4,7],[2,5,8],[0,4,8],[2,4,6]];for(const line of wins){const v=cells[line[0]];if(v&&line.every(i=>cells[i]===v))return v;}return cells.every(Boolean)?"draw":null;}
 function minimax(b,depth,isAI,alpha,beta){const v=evaluate3(b);if(v)return v==="O"?10-depth:v==="X"?depth-10:0;let best=isAI?-Infinity:Infinity;for(const i of [4,0,2,6,8,1,3,5,7]){if(b[i])continue;b[i]=isAI?"O":"X";let score=minimax(b,depth+1,!isAI,alpha,beta);b[i]="";best=isAI?Math.max(best,score):Math.min(best,score);if(isAI)alpha=Math.max(alpha,best);else beta=Math.min(beta,best);if(beta<=alpha)break;}return best;}
 function pickAI(){const available=empty();if(!available.length)return null;const flat=board.flat();let best=-Infinity,choices=[];for(const i of available){flat[i]="O";const score=minimax(flat,0,false,-Infinity,Infinity);flat[i]="";if(score>best){best=score;choices=[i];}else if(score===best)choices.push(i);}/* Every personality chooses only minimax-optimal moves. The AI cannot lose from an empty 3x3 board. */return random(choices);}
 function move(i){if(finished||thinking||get(i))return;set(i,"X");turns++;tone(520);if(settings.mode==="fair"){const w=match("X");if(w)return conclude("X",w);if(!empty().length)return conclude("draw");thinking=true;say("The AI is considering your questionable life choices.");draw();const stamp=session;setTimeout(()=>{if(stamp!==session)return;thinking=false;const p=pickAI();if(p!==null)set(p,"O");tone(310);const aw=match("O");if(aw)return conclude("O",aw);if(!empty().length)return conclude("draw");const lines={easy:["I am relaxed, not incompetent.","A friendly reminder: I cannot lose."],medium:["I saw that coming.","Nice try. I calculated all of that."],hard:taunts};say(random(lines[settings.difficulty]||taunts));draw();},220);return;}
-// Hell is narratively rigged: five Xs trigger a rule-breaking intervention, never a regular win.
-if(match("X")||match("X",true)){cheat(true);}
-else if(turns%3===0){cheat(false);}
-else{hellAI();say(random(taunts));}
-if(turns%4===0&&clues<5){clues++;say("A sealed transcript surfaced. FILE "+clues+"/5.");}if(convictions>=3&&clues>=5&&n===10&&!appealed){appealed=true;say("THE SUPREME COURT HAS LOST CONTROL. Final terminal command unlocked.");}
+// The machine earns the player's trust first. Every human turn gets exactly one ordinary AI reply.
+const impending=!!match("X")||!!match("X",true);
+hellAI();
+if(turns<=4){
+  say(turns===1?"Your opponent has entered its first move.":random(["A normal move. For now.","The machine is studying your strategy.","Your turn. Everything is functioning normally."]));
+}else if(impending||turns===5||((turns-5)%2===0)){
+  cheat(impending);
+}else{
+  say(random(taunts));
+}
+if(turns>=5&&turns%3===2&&clues<5){clues++;say("A sealed transcript surfaced. FILE "+clues+"/5.");}
+if(convictions>=3&&clues>=5&&n===10&&!appealed){appealed=true;say("THE SUPREME COURT HAS LOST CONTROL. Final terminal command unlocked.");}
 draw();}
 function expand(){if(n>=10)return false;const old=board;n++;board=Array.from({length:n},(_,r)=>Array.from({length:n},(_,c)=>old[r]?.[c]||""));return true;}
 function erase(){const xs=[];for(let i=0;i<n*n;i++)if(get(i)==="X")xs.push(i);for(let k=0;k<Math.min(2,xs.length);k++){const pick=Math.floor(Math.random()*xs.length);set(xs.splice(pick,1)[0],"");}}
@@ -174,19 +181,20 @@ const reduced=()=>window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function enterGame(){
  if(transitioning||intro.hidden)return;
  transitioning=true;
- intro.classList.add("intro-leaving");
- shell.inert=false;
- if(!reduced()){shutter.classList.remove("run");void shutter.offsetWidth;shutter.classList.add("run");}
- window.setTimeout(()=>{
-  intro.hidden=true;intro.classList.remove("intro-leaving");
-  shutter.classList.remove("run");transitioning=false;
-  $("board").querySelector("button:not(:disabled)")?.focus() || $("restart").focus();
- },reduced()?0:800);
+ const showGame=()=>{intro.hidden=true;intro.classList.remove("intro-leaving");shell.inert=false;};
+ const finish=()=>{transitioning=false;($("board").querySelector("button:not(:disabled)")||$("restart")).focus();};
+ if(!reduced()&&document.startViewTransition){
+   document.startViewTransition(showGame).finished.then(finish,finish);
+ }else{showGame();finish();}
 }
 function returnToTitle(){
  if(transitioning)return;
- intro.hidden=false;intro.classList.remove("intro-leaving");
- shell.inert=true;play.focus();
+ transitioning=true;
+ const showTitle=()=>{intro.hidden=false;intro.classList.remove("intro-leaving");shell.inert=true;};
+ const finish=()=>{transitioning=false;play.focus();};
+ if(!reduced()&&document.startViewTransition){
+   document.startViewTransition(showTitle).finished.then(finish,finish);
+ }else{showTitle();finish();}
 }
 play.addEventListener("click",enterGame);
 $("game-home").addEventListener("click",returnToTitle);
