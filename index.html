@@ -361,7 +361,7 @@ function terminal(){
  };
  input.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();execute();}});
  shell.append(output,input);
- modal("SEALED ARCHIVE","LOCAL SIMULATION. These commands only inspect the fictional game world.",[{label:"Run",primary:true,action:execute},{label:"Close"}],shell);
+ modal("SEALED ARCHIVE","LOCAL SIMULATION. These commands only inspect the fictional game world.",[{label:"Close",primary:true}],shell);
  input.focus();
 }
 function dossier(){
