@@ -213,3 +213,11 @@ The **Case Dossier** is now an editable filing workspace. You can create your ow
 **Score integrity versus villain theatrics:** Real human and machine points still follow one legitimate scoring event per completed move. The computer now separately claims increasingly outrageous *fake points* after rule-breaking in the incident log and evidence tracker. The fake tally is explicitly labeled and never alters the genuine scoreboard. This provides the desired extreme cheating without repeating the historical point-inflation bug.
 
 No third-party runtime, copyrighted audiovisual assets or unlicensed data were added. The changes preserve keyboard court combat and reduced-motion support.
+
+## The Last Square: narrative overhaul
+
+Tic Tac Hell now has a **five-act interactive narrative** with an ordinary opening, the Machine's first moment of panic, an unknown witness who kept copies of overwritten squares, a courtroom conspiracy, a jury that can disagree with its creator, and a final choice between liberation and power.
+
+The original story is implemented in `story-cinema.js` and `story-cinema.css`, with short illustrated, keyboard-accessible scenes that occur at real gameplay milestones. They can be skipped and have reduced-motion support. The courtroom's testimony and verdict text have been rewritten to reinforce the story. A spoiler-heavy character guide, chapter outline and ending descriptions are documented in [STORY.md](STORY.md).
+
+The script introduces no external APIs, copyrighted film/anime clips, non-free sprites or additional runtime dependencies.
