@@ -27,3 +27,39 @@
 @media(max-width:900px),(pointer:coarse){.fight-touch{display:flex}}
 @media(max-width:600px){.fight-head{padding:7px;gap:7px;font-size:.55rem}.fight-level{font-size:.57rem}.fight-help{font-size:.54rem}.fighter{width:58px;height:115px}.fight-announcer{font-size:.7rem}}
 @media(prefers-reduced-motion:reduce){.realtime-duel:before,.fighter-body,.fight-warning.active,.fighter.damaged{animation:none!important}}
+
+
+/* Court combat art direction v6: articulated original characters, no borrowed sprite sheets. */
+.fight-floor{background:radial-gradient(ellipse at 50% 90%,#ed8e9245,transparent 52%),linear-gradient(to top,#3a1b30,#171126 55%,#241130)}
+.fight-floor:before{content:"";position:absolute;inset:0;opacity:.5;pointer-events:none;background:linear-gradient(105deg,transparent 20%,#fff0ca0f 28%,transparent 34%,transparent 65%,#ff719e12 70%,transparent 76%),repeating-linear-gradient(90deg,#0000 0 18%,#ffb88620 19%,#0000 20% 40%)}
+.fighter{height:clamp(120px,18vw,215px);width:clamp(70px,10vw,122px);transform-origin:center bottom}
+.fighter .fighter-body{position:relative;overflow:visible;width:100%;height:94%;background:none!important;clip-path:none!important;animation:none!important;filter:none}
+.fighter .fighter-body>div{position:absolute;box-sizing:border-box}
+.fighter-head{width:43%;height:23%;left:29%;top:8%;z-index:5;border-radius:39% 43% 42% 38%;background:linear-gradient(150deg,#f6dfc4,#bd9f9c);border:2px solid #2a223a;box-shadow:inset -5px -6px #7b72956b}
+.fighter-eye{position:absolute;width:12%;height:12%;border-radius:50%;background:#12253f;top:45%;left:69%}
+.fighter-hair{width:50%;height:17%;top:2%;left:24%;z-index:7;border-radius:48% 38% 15% 18%;background:linear-gradient(120deg,#251d3c,#65406b);clip-path:polygon(0 45%,12% 10%,37% 0,58% 12%,81% 0,100% 55%,85% 90%,64% 61%,41% 99%,23% 70%)}
+.fighter-torso{height:38%;width:49%;top:29%;left:25%;z-index:4;background:linear-gradient(130deg,#70fae6,#277f9e 55%,#17446c);clip-path:polygon(22% 0,80% 0,100% 24%,85% 100%,18% 100%,0 24%);border-radius:5px}
+.fighter-arm{height:35%;width:15%;top:31%;z-index:6;border-radius:20px;background:linear-gradient(90deg,#5cf0d6,#206b91);transform-origin:50% 10%;box-shadow:inset -3px 0 #1526455e}
+.fighter-arm.near{left:67%;transform:rotate(-29deg)}.fighter-arm.far{left:17%;z-index:3;transform:rotate(20deg)}
+.fighter-leg{height:34%;width:20%;top:64%;z-index:3;background:linear-gradient(100deg,#24374c,#15172d);transform-origin:top;border-radius:0 0 7px 7px}
+.fighter-leg.near{left:52%;transform:rotate(-6deg)}.fighter-leg.far{left:29%;transform:rotate(7deg)}
+.fighter-aura{position:absolute;z-index:-1;inset:10% -10%;border-radius:50%;background:radial-gradient(ellipse,#78fff321,transparent 63%);filter:blur(9px)}
+.fighter.ai .fighter-head{background:linear-gradient(140deg,#d3b3e8,#816da9);box-shadow:inset -5px -6px #50306b}
+.fighter.ai .fighter-eye{background:#ff4d9e;box-shadow:0 0 10px #ff4d9e}
+.fighter.ai .fighter-hair{background:linear-gradient(125deg,#1e0a32,#8c3297)}
+.fighter.ai .fighter-torso{background:linear-gradient(125deg,#ffa5c7,#a02c76 56%,#48154f)}
+.fighter.ai .fighter-arm{background:linear-gradient(90deg,#f38db4,#802a80)}
+.fighter.ai .fighter-leg{background:linear-gradient(110deg,#42204d,#160e2a)}
+.fighter.ai .fighter-aura{background:radial-gradient(ellipse,#ff6aa82b,transparent 65%)}
+.fighter.walking .fighter-leg.near{animation:fighterStride .3s ease-in-out infinite alternate}
+.fighter.walking .fighter-leg.far{animation:fighterStride .3s ease-in-out infinite alternate-reverse}
+@keyframes fighterStride{to{transform:rotate(21deg)}}
+.fighter.fast-swing .fighter-arm.near{animation:fighterPunch .23s ease-out both}
+.fighter.heavy-swing .fighter-arm.near{animation:fighterHeavy .32s ease-out both}
+@keyframes fighterPunch{0%{transform:rotate(-35deg)}35%{transform:rotate(-95deg) translateY(-13px)}100%{transform:rotate(-29deg)}}
+@keyframes fighterHeavy{0%{transform:rotate(40deg)}45%{transform:rotate(-115deg) translateY(-12px)}100%{transform:rotate(-29deg)}}
+.fighter.blocking .fighter-arm.near{transform:rotate(-110deg) translateY(-6px);filter:drop-shadow(0 0 10px #ffe68b)}
+.fighter.airborne .fighter-leg.near{transform:rotate(33deg)}
+.combat-spark{position:absolute;z-index:10;color:#ffef99;text-shadow:0 0 25px #ff679f;font:900 clamp(2rem,5vw,4rem) Impact,system-ui;pointer-events:none;animation:combatImpact .35s ease-out both}
+@keyframes combatImpact{0%{opacity:0;transform:scale(.3) rotate(-30deg)}30%{opacity:1;transform:scale(1.35) rotate(15deg)}100%{opacity:0;transform:scale(1.9) rotate(35deg)}}
+@media(prefers-reduced-motion:reduce){.fighter.walking .fighter-leg,.fighter.fast-swing .fighter-arm.near,.fighter.heavy-swing .fighter-arm.near,.combat-spark{animation:none!important}}
