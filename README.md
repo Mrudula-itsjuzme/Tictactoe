@@ -28,14 +28,16 @@ The Java edition requires Java 11 or newer, a graphical desktop, and is **not** 
 
 | Mode | Rules | What makes it interesting |
 | --- | --- | --- |
-| **Fair play** | 3×3; first three in a row wins | Proper win/draw detection; selectable AI difficulty |
+| **Fair play** | 3×3; first three in a row wins | Proper win/draw detection; AI never loses across all personalities |
 | **Hell** | Starts 3×3, grows to at most 10×10; five in a row on larger boards | The AI cheats, deletes moves, takes extra turns, issues fictional OS warnings, and can be challenged in court |
 
 ### Opponents
 
-- **Chill:** chooses random legal moves.
-- **Clever:** usually plays optimally, sometimes makes a mistake.
-- **Unbeatable:** perfect-play minimax with alpha-beta pruning. With optimal human play, a draw is the best possible outcome.
+- **Chill (still unbeatable):** relaxed commentary, but only optimal moves.
+- **Clever (still unbeatable):** sharper taunts, and the same perfect strategy.
+- **Merciless (unbeatable):** relentless taunts and perfect-play minimax.
+
+**All three personalities use perfect-play minimax with alpha-beta pruning.** They differ in attitude, never in playing strength. The human can at best draw when playing perfectly.
 
 The AI moves second. It never overwrites occupied squares in fair mode. Hell mode is **deliberately unfair** and does not promise the normal win conditions.
 
@@ -81,7 +83,7 @@ This is a static HTML site. To deploy on Vercel, import this GitHub repository, 
 
 ## Development notes
 
-The fair-mode AI uses minimax over the nine-cell game tree. Scores reward faster wins and slower defeats. Alpha-beta pruning eliminates branches that cannot change the best decision. Hell mode deliberately uses different game logic and sometimes violates fair-play rules.
+All fair-mode opponents use minimax over the nine-cell game tree. Scores reward faster wins and slower defeats. Alpha-beta pruning eliminates branches that cannot change the best decision. Hell mode deliberately uses different game logic and sometimes violates fair-play rules.
 
 ## Contributing and safety
 
