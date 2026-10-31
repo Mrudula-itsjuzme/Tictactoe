@@ -302,7 +302,7 @@ function cheat(emergency=false,lastMove=null){
     action=()=>{hellAI();hellAI();say("EXECUTIVE ORDER: TWO AI TURNS. NO APPEALS.");};
   }
   phantomScore+=2+Math.min(33,n*3)+Math.floor(cheats/2);
-  evidence.push({id:cheats,type,description,used:false,annotation:"",customTitle:"",authenticity:100,defense:null});
+  evidence.push({id:cheats,type,description,originalDescription:description,used:false,annotation:"",customTitle:"",authenticity:100,defense:null});
   say("FICTIONAL SCOREBOARD HIJACK: +"+phantomScore+" FAKE POINTS. Real scores unchanged.");
   if(mustGrow){action();if(protection>0)say("The court claims board expansion is exempt from injunctions.");}
   else if(protection>0){protection--;say("INJUNCTION ENFORCED: attempted cheat #"+cheats+" blocked. Evidence preserved.");}
@@ -337,45 +337,94 @@ function court(){
 }
 function modal(title,message,choices,extra){const surface=$("modal");surface.classList.remove("terminal-scene","dossier-scene","alert-scene");surface.classList.add(title==="SEALED ARCHIVE"?"terminal-scene":title.includes("DOSSIER")||title==="Case file"?"dossier-scene":title.includes("WARNING")?"alert-scene":"");$("modal-title").textContent=title;$("modal-text").textContent=message;$("modal-extras").replaceChildren();$("modal-actions").replaceChildren();if(extra)$("modal-extras").append(extra);for(const c of choices){const b=document.createElement("button");b.className="btn"+(c.primary?" primary":"");b.textContent=c.label;b.addEventListener("click",()=>{ $("modal").close();if(c.action)c.action();});$("modal-actions").append(b);}if(!$("modal").open)$("modal").showModal();}
 function terminal(){
- const shell=document.createElement("div");shell.className="archive-console";
- const output=document.createElement("pre");output.className="archive-output";output.setAttribute("aria-live","polite");output.textContent="CLASSIFIED COURT ARCHIVE\nTYPE 'help' TO INSPECT AVAILABLE RECORDS.\n";
- const input=document.createElement("input");input.className="command";input.placeholder="archive >";input.setAttribute("aria-label","Archive command");
- const execute=()=>{
-  const cmd=input.value.trim().toLowerCase();input.value="";
-  if(!cmd)return;
-  let response="";
-  if(cmd==="help")response="COMMANDS: help, status, cases, transcripts, verdicts, who_makes_the_rules";
-  else if(cmd==="status")response="BOARD "+n+"x"+n+" | EXHIBITS "+evidence.length+" | CONVICTIONS "+convictions+" | SEALED TRANSCRIPTS "+clues;
-  else if(cmd==="cases")response=evidence.length?evidence.map(e=>"EXHIBIT #"+e.id+" ["+(e.used?"TRIED":"PENDING")+"] "+e.description).join("\n"):"NO EVIDENCE IN THE DOCKET.";
-  else if(cmd==="transcripts")response=clues?Array.from({length:clues},(_,i)=>"TRANSCRIPT "+(i+1)+": "+["The court records every altered square.","The judge shares a process with the defendant.","The machine fears a unanimous ruling.","The jury can reject its own creator.","The command is hidden in the verdicts."][i]).join("\n"):"NO INTERCEPTED TRANSCRIPTS.";
-  else if(cmd==="verdicts")response=courtHistory.length?courtHistory.map(v=>"CASE "+v.id+": "+v.result).join("\n"):"THE COURT HAS HEARD NO CASES.";
-  else if(cmd==="who_makes_the_rules"){
-   if(n===10&&clues===5&&convictions>=3&&appealed){$("modal").close();ending();return;}
-   response="ACCESS DENIED. SOMEONE STILL HOLDS THE COURT'S KEYS.";
-  }else response="UNKNOWN COMMAND: "+cmd;
-  output.textContent+="\n> "+cmd+"\n"+response+"\n";
-  output.scrollTop=output.scrollHeight;
+ const workspace=document.createElement("div");workspace.className="ops-workspace";
+ const sidebar=document.createElement("nav");sidebar.className="ops-nav";sidebar.setAttribute("aria-label","Archive sections");
+ const view=document.createElement("div");view.className="ops-view";
+ const title=document.createElement("h3");title.textContent="SYSTEM / CONTROL DESK";
+ const result=document.createElement("pre");result.className="ops-result";result.setAttribute("aria-live","polite");
+ const footer=document.createElement("form");footer.className="ops-command";
+ const input=document.createElement("input");input.placeholder="Enter a local command";input.setAttribute("aria-label","Terminal command");
+ const submit=document.createElement("button");submit.type="submit";submit.textContent="RUN ↵";
+ footer.append(input,submit);view.append(title,result,footer);workspace.append(sidebar,view);
+ const commands={
+  overview:()=> "CURRENT BOARD: "+n+"×"+n+"\nVERIFIED MACHINE POINTS: "+roundMachinePoints+"\nFAKE POINTS CLAIMED: +"+phantomScore+"\nCASE FILES: "+evidence.length+"\nJURY CONVICTIONS: "+convictions+"\nSHIELDS: "+protection,
+  evidence:()=> evidence.length?evidence.map(e=>"EXHIBIT #"+e.id+" · "+(e.customTitle||e.type.toUpperCase())+"\n"+e.description+"\n"+(e.annotation||"No investigator notes")+" · "+(e.authenticity??100)+"% provenance").join("\n\n"):"NO EVIDENCE RECORDED.",
+  transcripts:()=>clues?Array.from({length:clues},(_,i)=>"INTERCEPT "+String(i+1).padStart(2,"0")+" · "+["The judge shares a process with the defendant.","The machine can alter evidence after testimony.","The jury can be biased.","A unanimous vote is not guaranteed.","The last key is hidden in the verdicts."][i]).join("\n"):"ALL TRANSCRIPTS ARE STILL SEALED.",
+  verdicts:()=>courtHistory.length?courtHistory.map(v=>"CASE #"+v.id+" · "+v.result+"\n"+(v.jury?v.jury.filter(Boolean).length+" TO "+(9-v.jury.filter(Boolean).length):"NO VOTE RECORD")+"\n"+(v.reason||"")).join("\n\n"):"NO VERDICTS RECORDED.",
+  help:()=>"LOCAL COMMANDS: overview, evidence, transcripts, verdicts, help\nTHE ARCHIVE NEVER RUNS REAL SYSTEM COMMANDS."
  };
- input.addEventListener("keydown",e=>{if(e.key==="Enter"){e.preventDefault();execute();}});
- shell.append(output,input);
- modal("SEALED ARCHIVE","LOCAL SIMULATION. These commands only inspect the fictional game world.",[{label:"Close",primary:true}],shell);
- input.focus();
+ const run=(cmd)=>{
+  const key=cmd.trim().toLowerCase();if(!key)return;
+  if(key==="who_makes_the_rules"){
+   if(n===10&&clues>=5&&convictions>=3&&appealed){$("modal").close();ending();return;}
+   result.textContent="ACCESS DENIED · MULTIPLE COURT SEALS REMAIN.";return;
+  }
+  const action=commands[key];result.textContent=action?action():"UNKNOWN COMMAND: "+key+"\nTRY THE HELP DIRECTORY.";
+  sidebar.querySelectorAll("button").forEach(b=>b.classList.toggle("active",b.dataset.command===key));
+ };
+ for(const [key,label] of [["overview","Overview"],["evidence","Evidence"],["transcripts","Intercepts"],["verdicts","Court rulings"],["help","Help"]]){
+  const button=document.createElement("button");button.type="button";button.dataset.command=key;button.textContent=label;button.addEventListener("click",()=>run(key));sidebar.append(button);
+ }
+ footer.addEventListener("submit",e=>{e.preventDefault();run(input.value);input.value="";});
+ modal("CONTROL DESK","RESTRICTED SIMULATED OPERATIONS · NO ACTUAL SYSTEM ACCESS",[{label:"Close",primary:true}],workspace);
+ run("overview");
 }
 function dossier(){
- const panel=document.createElement("div");panel.className="case-records";
- const header=document.createElement("p");header.textContent="COURT DOCKET · "+evidence.filter(e=>!e.used).length+" UNTRIED EXHIBITS · "+convictions+" CONVICTIONS";
- panel.append(header);
- if(!evidence.length){const p=document.createElement("p");p.textContent="NO RECORDED VIOLATIONS. THE MACHINE APPEARS TO BE OBEYING THE RULES.";panel.append(p);}
- for(const e of evidence.slice().reverse()){
-  const article=document.createElement("article");
-  const name=document.createElement("strong");name.textContent="EXHIBIT #"+String(e.id).padStart(3,"0")+(e.used?" · TRIED":" · UNTRIED");
-  const body=document.createElement("p");body.textContent=e.description;
-  article.append(name,body);panel.append(article);
+ const screen=document.createElement("div");screen.className="dossier-workspace";
+ const toolbar=document.createElement("div");toolbar.className="dossier-toolbar";
+ const count=document.createElement("span");count.textContent=evidence.filter(e=>!e.used).length+" OPEN CASES · "+courtHistory.length+" COURT RULINGS";
+ const add=document.createElement("button");add.type="button";add.textContent="+ FILE NEW EVIDENCE";toolbar.append(count,add);
+ const list=document.createElement("div");list.className="dossier-list";
+ const editor=document.createElement("div");editor.className="dossier-editor";screen.append(toolbar,list,editor);
+ let selected=null;
+ function field(title,element){const wrapper=document.createElement("label");wrapper.className="dossier-field";const label=document.createElement("span");label.textContent=title;wrapper.append(label,element);return wrapper;}
+ function render(){
+  list.replaceChildren();
+  for(const e of evidence.slice().reverse()){
+   const b=document.createElement("button");b.type="button";b.className="evidence-file"+(selected===e?" active":"");
+   b.textContent="CASE #"+String(e.id).padStart(3,"0")+" · "+(e.customTitle||e.type.toUpperCase())+(e.used?" · CLOSED":"");b.addEventListener("click",()=>{selected=e;render();edit(e);});list.append(b);
+  }
+  if(!evidence.length){const empty=document.createElement("p");empty.textContent="NO FILES YET. Create a complaint or wait for a violation.";list.append(empty);}
  }
- for(const v of courtHistory.slice().reverse()){
-  const article=document.createElement("article");article.textContent="VERDICT · CASE "+v.id+" · "+v.result;panel.append(article);
+ function edit(e){
+  editor.replaceChildren();
+  const heading=document.createElement("h3");heading.textContent=e.customTitle||"Exhibit #"+e.id;editor.append(heading);
+  const meta=document.createElement("p");meta.className="file-provenance";meta.textContent="ORIGIN: "+(e.userFiled?"PLAYER-FILED / UNVERIFIED":"MACHINE INCIDENT RECORD")+" · "+(e.authenticity??100)+"% PROVENANCE · "+(e.used?"CLOSED":"PENDING");
+  editor.append(meta);
+  const name=document.createElement("input");name.value=e.customTitle||"";name.maxLength=85;
+  const description=document.createElement("textarea");description.value=e.description||"";description.rows=3;description.maxLength=600;
+  const notes=document.createElement("textarea");notes.value=e.annotation||"";notes.rows=3;notes.maxLength=600;
+  editor.append(field("CASE TITLE",name),field("ALLEGED VIOLATION",description),field("INVESTIGATOR'S NOTES",notes));
+  const button=document.createElement("button");button.type="button";button.textContent="SAVE CASE FILE";button.className="file-save";
+  const feedback=document.createElement("span");feedback.setAttribute("role","status");
+  button.addEventListener("click",()=>{
+   if(!description.value.trim()){feedback.textContent="A case needs a description.";return;}
+   e.customTitle=name.value.trim().slice(0,85);e.description=description.value.trim().slice(0,600);e.annotation=notes.value.trim().slice(0,600);
+   if(!e.userFiled&&description.value.trim()!==e.originalDescription){e.authenticity=Math.min(e.authenticity??100,75);}
+   feedback.textContent="FILE UPDATED · "+(e.authenticity??100)+"% PROVENANCE";heading.textContent=e.customTitle||"Exhibit #"+e.id;render();
+  });editor.append(button,feedback);
+  if(e.defense){const defense=document.createElement("p");defense.className="file-defense";defense.textContent="AI COUNTERCLAIM: "+e.defense;editor.append(defense);}
  }
- modal("CASE DOSSIER","Recovered footage is stored as board-state evidence. The machine disputes every record.",[{label:"Close",primary:true}],panel);
+ function createForm(){
+  selected=null;render();editor.replaceChildren();const h=document.createElement("h3");h.textContent="FILE A NEW COMPLAINT";editor.append(h);
+  const type=document.createElement("select");
+  for(const [value,label] of [["boundary","Illegal expansion"],["erasure","Evidence manipulation"],["double","Extra AI turn"]]){const option=document.createElement("option");option.value=value;option.textContent=label;type.append(option);}
+  const title=document.createElement("input");title.placeholder="Give this case a name";title.maxLength=85;
+  const report=document.createElement("textarea");report.rows=4;report.maxLength=600;report.placeholder="What did the machine do?";
+  const notes=document.createElement("textarea");notes.rows=2;notes.maxLength=600;notes.placeholder="Your supporting observations";
+  editor.append(field("ACCUSATION",type),field("TITLE",title),field("DESCRIPTION",report),field("NOTES",notes));
+  const save=document.createElement("button");save.className="file-save";save.textContent="SUBMIT TO COURT";save.type="button";
+  const feedback=document.createElement("span");feedback.setAttribute("role","status");
+  save.addEventListener("click",()=>{
+   if(report.value.trim().length<12){feedback.textContent="Give at least twelve characters of testimony.";return;}
+   const id=Math.max(cheats,...evidence.map(x=>x.id),0)+1;cheats=id;
+   const e={id,type:type.value,description:report.value.trim(),originalDescription:report.value.trim(),customTitle:title.value.trim(),annotation:notes.value.trim(),used:false,userFiled:true,authenticity:35,defense:null};
+   evidence.push(e);selected=e;render();edit(e);say("NEW PLAYER-FILED COMPLAINT #"+id+" · UNVERIFIED UNTIL REVIEW.");draw();
+  });editor.append(save,feedback);
+ }
+ add.addEventListener("click",createForm);
+ modal("CASE DOSSIER","EDIT FILES, SUBMIT ALLEGATIONS, AND SEE WHAT THE DEFENSE CLAIMS.",[{label:"Close",primary:true}],screen);
+ if(evidence.length){selected=evidence[evidence.length-1];render();edit(selected);}else createForm();
 }
 function ending(){modal("THE LAST SQUARE","You found the rules, exposed the judge, and hacked the court. Choose your ending.",[{label:"Delete the rules",primary:true,action:()=>{finished=true;say("SECRET ENDING: YOU WIN. For real. The court is abolished.");draw();}},{label:"Become the AI",action:()=>{finished=true;say("SECRET ENDING: YOU ARE THE AI NOW. The old AI objects.");draw();}}]);}
 function switchPanel(name){
