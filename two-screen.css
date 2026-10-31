@@ -55,3 +55,35 @@ body{overflow:hidden!important}
 @media(max-width:900px){body{overflow:auto!important}.arcade-shell{height:auto;max-height:none;min-height:100dvh;overflow:visible}.arcade-layout{display:flex;flex-direction:column;overflow:visible}.arcade-arena{height:min(78dvh,750px);min-height:480px}.arcade-sidebar{height:auto;overflow:visible;display:grid;grid-template-columns:1fr 1fr}.arcade-chronicle{min-height:320px}.arcade-arena .board,.arcade-arena .board.big{width:min(100%,calc(78dvh - 205px),480px)}}
 @media(max-width:620px){.arcade-sidebar{display:flex}.arcade-arena{height:min(85dvh,650px);min-height:415px}.arcade-arena .board,.arcade-arena .board.big{width:min(100%,calc(85dvh - 210px),360px)}.arcade-header .brand-mark{display:none}.arcade-shell .marquee-line{display:none}.intro-title{font-size:clamp(4rem,17vw,7rem)}.intro-xo{font-size:6rem}}
 @media(prefers-reduced-motion:reduce){.game-intro:before,.intro-xo,.stamp-pulse{animation:none!important}.intro-shutter.run{animation:none!important;visibility:hidden}.game-intro{transition:none!important}.intro-play{transition:none!important}}
+
+
+/* Board geometry: never spill past the arena, even at 10x10. */
+.arcade-arena .arena-stage{min-height:0;min-width:0;overflow:hidden;display:flex;align-items:center;justify-content:center}
+.arcade-arena .board,.arcade-arena .board.big{
+  width:min(100%,calc(100dvh - 265px),min(70vw,510px));
+  height:auto;max-height:100%;
+  aspect-ratio:1;
+  min-height:0;min-width:0;
+  grid-auto-rows:minmax(0,1fr);
+  margin:auto;
+}
+.arcade-arena .board .cell,.arcade-arena .board.big .cell{
+  aspect-ratio:auto;min-width:0;min-height:0;padding:0;line-height:1;
+  border-radius:3px;
+}
+.arcade-arena .board.big{gap:clamp(2px,.3vw,4px)}
+.arcade-arena .board.big .cell{font-size:clamp(.56rem,1.8vw,1.35rem)}
+/* Native title/game transition with a browser-managed snapshot, and a no-animation fallback. */
+.game-intro{view-transition-name:title-screen}
+.arcade-shell{view-transition-name:game-screen}
+::view-transition-old(title-screen){animation:titleOut .48s cubic-bezier(.55,0,.3,1) both}
+::view-transition-new(title-screen){animation:titleIn .48s cubic-bezier(.2,.7,.2,1) both}
+::view-transition-old(game-screen){animation:gameOut .48s ease both}
+::view-transition-new(game-screen){animation:gameIn .48s cubic-bezier(.2,.7,.2,1) both}
+@keyframes titleOut{to{opacity:0;transform:scale(1.12);filter:blur(9px)}}
+@keyframes titleIn{from{opacity:0;transform:scale(1.08);filter:blur(6px)}}
+@keyframes gameOut{to{opacity:0;transform:translateY(30px) scale(.97)}}
+@keyframes gameIn{from{opacity:0;transform:translateY(25px) scale(.96)}}
+@media(max-width:900px){.arcade-arena .board,.arcade-arena .board.big{width:min(100%,calc(78dvh - 225px),460px)}}
+@media(max-width:620px){.arcade-arena .board,.arcade-arena .board.big{width:min(100%,calc(85dvh - 240px),350px)}}
+@media(prefers-reduced-motion:reduce){::view-transition-old(*),::view-transition-new(*){animation-duration:.01ms!important}}
