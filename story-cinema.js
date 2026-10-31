@@ -72,10 +72,17 @@ function open(id,{onDone,canSkip=true}={}){
  const root=document.createElement("section");root.className="story-cinema story-"+data.portrait+" story-chapter-"+id;root.setAttribute("role","dialog");root.setAttribute("aria-modal","true");root.setAttribute("aria-label",data.title);
  const shade=document.createElement("div");shade.className="story-lighting";
  const artwork=document.createElement("div");artwork.className="story-artwork";
+ const video=document.createElement("video");video.className="story-clip";video.muted=true;video.autoplay=true;video.loop=true;video.playsInline=true;video.preload="metadata";video.setAttribute("aria-hidden","true");
+ video.poster=ART[id];video.src=ART[id].replace(/\\.webp$/,".mp4");video.src=ART[id].replace(".webp",".mp4");
+ video.addEventListener("playing",()=>root.classList.add("has-story-video"));
+ video.addEventListener("error",()=>{video.hidden=true;root.classList.remove("has-story-video");});
+ const reducedMotion=window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches;
+ if(reducedMotion){video.hidden=true;video.autoplay=false;video.removeAttribute("src");}
+
  const img=document.createElement("img");img.alt=data.chapter+" illustrated chapter artwork";img.src=ART[id];img.decoding="async";img.loading="eager";
  img.addEventListener("load",()=>root.classList.add("has-story-art"),{once:true});
  img.addEventListener("error",()=>{img.hidden=true;root.classList.add("story-art-unavailable");},{once:true});
- artwork.append(img);
+ artwork.append(img,video);
  const scene=document.createElement("div");scene.className="story-scene";
  const top=document.createElement("div");top.className="story-top";
  const chapter=document.createElement("span");chapter.textContent=data.chapter;
@@ -94,12 +101,12 @@ function open(id,{onDone,canSkip=true}={}){
  top.append(chapter,skip);scene.append(artwork,top,banner,portraits,dialog);root.append(shade,scene);
  let index=0,closed=false,previous=document.activeElement;
  const paint=()=>{text.textContent=plain(data.lines[index]);progress.textContent=(index+1)+" / "+data.lines.length;button.textContent=index===data.lines.length-1?"RETURN TO GAME ↗":"NEXT LINE →";root.dataset.line=String(index);};
- const close=(suppressed=false)=>{if(closed)return;closed=true;root.remove();document.removeEventListener("keydown",key,true);if(active?.root===root)active=null;if(previous?.isConnected)previous.focus();if(!suppressed)onDone?.();};
+ const close=(suppressed=false)=>{if(closed)return;closed=true;video.pause();video.removeAttribute("src");video.load();root.remove();document.removeEventListener("keydown",key,true);if(active?.root===root)active=null;if(previous?.isConnected)previous.focus();if(!suppressed)onDone?.();};
  const next=()=>{if(index+1<data.lines.length){index++;paint();}else close();};
  const key=e=>{if(e.key==="Escape"&&canSkip){e.preventDefault();e.stopPropagation();close();}else if(e.key==="Enter"||e.key===" "){if(e.target===skip)return;e.preventDefault();e.stopPropagation();next();}else if(e.key==="Tab"){const targets=[skip,button];if(e.shiftKey&&document.activeElement===skip){e.preventDefault();button.focus();}else if(!e.shiftKey&&document.activeElement===button){e.preventDefault();skip.focus();}}};
  skip.onclick=()=>close();button.onclick=next;
  if(!canSkip)skip.hidden=true;
- document.body.append(root);document.addEventListener("keydown",key,true);active={root,close};paint();button.focus();
+ document.body.append(root);document.addEventListener("keydown",key,true);active={root,close};if(!reducedMotion)video.play().catch(()=>{video.hidden=true;});paint();button.focus();
 }
 window.HellStory={open,close:()=>active?.close(true),chapters:Object.keys(CHAPTERS)};
 })();
