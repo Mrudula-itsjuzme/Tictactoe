@@ -162,3 +162,7 @@ This is an experimental browser game: source syntax and deployment can be checke
 ## Hidden-reveal gameplay (October 2026)
 
 Hell mode now deliberately begins as ordinary 3×3 tic-tac-toe with the same perfect-play opening as Fair mode. The first serious player threat after at least three X moves reveals the machine's secret: a cinematic tantrum followed by a visible, staggered **X-to-O conversion**. The original board is displayed before any transformation, and the machine doesn't flood it with O marks beforehand. The takeover itself creates a courtroom exhibit and can expand the board, after which AI play and later rule-breaking resume. Stolen X marks are not counted as legitimate machine victories; a completed player line still earns its human point before the theft. Timers are guarded by round session IDs to prevent old cutscenes editing a restarted round. This is a fictional, intentional rule change, not standard tic-tac-toe gameplay.
+
+## Courtroom art and score corrections (v6)
+
+The AI's first three-in-a-row now credits a machine point during the normal 3×3 minimax opening. Later, each newly completed O line is counted once, while the fictional X-to-O takeover still does not grant unearned machine points. The real-time courtroom battle now uses original articulated HTML/CSS characters with separate head, torso, limbs and facial details; walking legs, strike/heavy punch poses, hit sparks, and combo announcements make combat actions more legible. These are original in-repository effects, not copyrighted footage or commercial sprites.
