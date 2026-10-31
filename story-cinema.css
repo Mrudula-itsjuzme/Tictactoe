@@ -1,0 +1,44 @@
+/* THE LAST SQUARE · original cinematic narrative visual system */
+.story-cinema{position:fixed;inset:0;z-index:12000;background:#06050b;display:grid;place-items:center;overflow:hidden;color:#fff4e4;isolation:isolate}
+.story-lighting{position:absolute;inset:-35%;background:radial-gradient(circle at 47% 33%,#ff547a46,transparent 32%),conic-gradient(from 40deg at 47% 55%,transparent,#ffb66e0b,transparent,#b7407f19,transparent);animation:storyOrbit 24s linear infinite}
+.story-cinema.story-witness .story-lighting{background:radial-gradient(ellipse at 50% 40%,#1cb9a743,transparent 45%),linear-gradient(135deg,#081923,#080812)}
+.story-cinema.story-judge .story-lighting{background:radial-gradient(ellipse at 50% 30%,#e6a45a4f,transparent 45%),linear-gradient(120deg,#271023,#09060d)}
+.story-cinema.story-host .story-lighting{background:radial-gradient(ellipse at 50% 35%,#6a46e33b,transparent 47%),#080716}
+.story-scene{position:relative;z-index:2;width:min(1120px,96vw);height:min(760px,95dvh);border:1px solid #e9b38370;overflow:hidden;display:grid;grid-template-rows:auto auto minmax(0,1fr) auto;background:linear-gradient(160deg,#1d0d23d9,#130a1bd9 70%);box-shadow:0 0 90px #000c,0 0 100px #eb4f6e2b;animation:sceneEnter .5s cubic-bezier(.13,1,.3,1) both}
+.story-scene:before{content:"";position:absolute;inset:0;pointer-events:none;opacity:.16;background:repeating-linear-gradient(0deg,#fff1 0 1px,transparent 1px 7px);z-index:8}
+.story-top{padding:18px clamp(14px,3vw,32px);display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffb58c55}
+.story-top span{font:900 .67rem system-ui;letter-spacing:.2em;color:#f7c991}
+.story-skip{background:transparent;border:1px solid #b26f8c;color:#e4bbcc;padding:9px 12px;cursor:pointer;font:800 .65rem system-ui;letter-spacing:.1em}
+.story-skip:hover{background:#693048;color:#fff}
+.story-banner{padding:clamp(16px,3vw,36px) clamp(15px,4vw,48px) 0}
+.story-banner span{color:#75f5e1;font:900 .64rem system-ui;letter-spacing:.2em}
+.story-banner h2{margin:9px 0;color:#ffe2b8;font:italic 900 clamp(2rem,5.3vw,5.5rem)/.99 Georgia,serif;letter-spacing:-.035em;max-width:800px;text-shadow:4px 5px #421427}
+.story-portraits{min-height:0;position:relative;display:flex;justify-content:center;align-items:end}
+.story-portraits strong{position:absolute;left:clamp(16px,5vw,60px);bottom:15px;font:900 clamp(.7rem,1.3vw,1.15rem) system-ui;letter-spacing:.14em;color:#ffdaa8;background:#130b1ec9;border-left:4px solid #fd7395;padding:12px 16px}
+.story-character{position:relative;width:clamp(135px,28vw,330px);height:100%;max-height:340px;filter:drop-shadow(0 0 36px #ff79ab55);animation:characterFloat 3.2s ease-in-out infinite}
+.story-halo{position:absolute;inset:0;background:radial-gradient(ellipse at 50% 54%,#ffab7840,transparent 65%)}
+.story-face{position:absolute;top:10%;left:25%;width:50%;height:56%;background:linear-gradient(140deg,#f7d5b7,#ba8092);border:5px solid #39243d;border-radius:47% 47% 41% 41%;box-shadow:0 -16px #2e1d3c,inset -12px -13px #865778}
+.story-eye{position:absolute;top:44%;width:13%;height:10%;border-radius:50%;background:#231628;box-shadow:0 0 9px #e7c59d}
+.story-eye.left{left:20%}.story-eye.right{right:20%}
+.story-mouth{position:absolute;bottom:19%;left:35%;height:5%;width:30%;background:#71364e;border-radius:100%}
+.story-cloak{position:absolute;bottom:-22%;left:9%;height:52%;width:82%;background:linear-gradient(115deg,#521c4d,#160d2b);clip-path:polygon(30% 0,70% 0,100% 46%,96% 100%,4% 100%,0 46%);border-radius:30% 30% 0 0}
+.story-machine .story-face{background:linear-gradient(130deg,#cda9fa,#624698);border-color:#36194e;border-radius:15% 15% 37% 37%}
+.story-machine .story-eye{background:#ff378e;box-shadow:0 0 20px #ff46a1}
+.story-machine .story-mouth{background:#ff71a6}
+.story-machine .story-cloak{background:linear-gradient(120deg,#602168,#1c0a35)}
+.story-witness .story-face{background:#142c40;border-color:#7dffee;border-radius:50% 50% 15% 15%;box-shadow:0 0 38px #38ffe788}
+.story-witness .story-eye{background:#95fff0;box-shadow:0 0 20px #91ffed}
+.story-witness .story-mouth{background:#54ffe6}
+.story-witness .story-cloak{background:linear-gradient(120deg,#176e75,#071d31)}
+.story-judge .story-face{background:linear-gradient(110deg,#efd0a0,#8d4c69);border-color:#bb8a51}
+.story-judge .story-cloak{background:linear-gradient(115deg,#8c3b45,#200b1c)}
+.story-dialog{z-index:4;padding:clamp(17px,3vw,30px) clamp(17px,4vw,45px);background:linear-gradient(105deg,#27142deb,#130d20fa);border-top:2px solid #f0a77f;min-height:170px;display:flex;flex-direction:column;gap:16px;box-shadow:0 -20px 50px #0006}
+.story-dialog p{margin:0;min-height:65px;color:#fff2e2;font:600 clamp(1.05rem,2vw,1.58rem)/1.5 Georgia,serif;animation:dialogReveal .26s ease both}
+.story-navigation{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.story-navigation span{font:800 .7rem system-ui;color:#afa3bd}
+.story-navigation button{background:#ff6b98;color:#220b1a;border:0;padding:13px 24px;font:900 .74rem system-ui;letter-spacing:.08em;cursor:pointer;box-shadow:4px 4px #58203d}
+.story-navigation button:hover{background:#ffc0aa;transform:translateY(-2px)}
+@keyframes storyOrbit{to{transform:rotate(360deg)}}@keyframes sceneEnter{from{opacity:0;transform:scale(.94) translateY(25px)}to{opacity:1;transform:none}}@keyframes characterFloat{50%{transform:translateY(-7px)}}@keyframes dialogReveal{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@media(max-height:650px){.story-scene{height:96dvh}.story-banner{padding-top:10px}.story-banner h2{font-size:clamp(1.5rem,4vw,3rem)}.story-dialog{min-height:130px;padding:13px}.story-dialog p{min-height:40px;font-size:1rem}.story-character{max-height:210px}}
+@media(max-width:600px){.story-scene{width:100vw;height:100dvh}.story-top{padding:12px}.story-top span{font-size:.52rem;letter-spacing:.1em}.story-banner h2{font-size:clamp(2rem,8vw,3.4rem)}.story-dialog{padding:16px;min-height:190px}.story-dialog p{font-size:1.04rem}.story-character{max-height:240px}.story-portraits strong{padding:7px 10px;font-size:.65rem;bottom:3px}}
+@media(prefers-reduced-motion:reduce){.story-lighting,.story-scene,.story-character,.story-dialog p{animation:none!important}}
