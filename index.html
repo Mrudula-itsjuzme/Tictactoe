@@ -20,6 +20,7 @@ button,select,input{font:inherit}button{cursor:pointer}button:focus-visible,sele
 <link rel="stylesheet" href="court-drama.css">
 <link rel="stylesheet" href="arcade.css">
 <link rel="stylesheet" href="two-screen.css">
+<link rel="stylesheet" href="v4-combat.css">
 </head>
 <body>
 <section class="game-intro" id="game-intro" aria-labelledby="intro-heading">
@@ -177,7 +178,7 @@ function court(){
     draw();
   }});
 }
-function modal(title,message,choices,extra){$("modal-title").textContent=title;$("modal-text").textContent=message;$("modal-extras").replaceChildren();$("modal-actions").replaceChildren();if(extra)$("modal-extras").append(extra);for(const c of choices){const b=document.createElement("button");b.className="btn"+(c.primary?" primary":"");b.textContent=c.label;b.addEventListener("click",()=>{ $("modal").close();if(c.action)c.action();});$("modal-actions").append(b);}if(!$("modal").open)$("modal").showModal();}
+function modal(title,message,choices,extra){const surface=$("modal");surface.classList.remove("terminal-scene","dossier-scene","alert-scene");surface.classList.add(title==="SEALED ARCHIVE"?"terminal-scene":title.includes("DOSSIER")||title==="Case file"?"dossier-scene":title.includes("WARNING")?"alert-scene":"");$("modal-title").textContent=title;$("modal-text").textContent=message;$("modal-extras").replaceChildren();$("modal-actions").replaceChildren();if(extra)$("modal-extras").append(extra);for(const c of choices){const b=document.createElement("button");b.className="btn"+(c.primary?" primary":"");b.textContent=c.label;b.addEventListener("click",()=>{ $("modal").close();if(c.action)c.action();});$("modal-actions").append(b);}if(!$("modal").open)$("modal").showModal();}
 function terminal(){const input=document.createElement("input");input.className="command";input.placeholder="Enter a command…";input.setAttribute("aria-label","Fictional terminal command");const run=()=>{const cmd=input.value.trim().toLowerCase();$("modal").close();if(cmd==="who_makes_the_rules"&&n===10&&clues===5&&convictions>=3&&appealed){ending();return;}const map={help:"Commands: help, win, sudo win, delete ai, who_makes_the_rules",win:"403: Happiness forbidden.","sudo win":"Administrator of nothing.","delete ai":"I pay rent here.",who_makes_the_rules:"ACCESS DENIED. The sealed transcripts mention a compromised court."};say(map[cmd]||"Unknown command. Your keyboard is on trial.");};input.addEventListener("keydown",e=>{if(e.key==="Enter")run();});modal("SEALED ARCHIVE","A broken cursor blinks under a classified court seal.",[{label:"Run command",primary:true,action:run},{label:"Cancel"}],input);input.focus();}
 function ending(){modal("THE LAST SQUARE","You found the rules, exposed the judge, and hacked the court. Choose your ending.",[{label:"Delete the rules",primary:true,action:()=>{finished=true;say("SECRET ENDING: YOU WIN. For real. The court is abolished.");draw();}},{label:"Become the AI",action:()=>{finished=true;say("SECRET ENDING: YOU ARE THE AI NOW. The old AI objects.");draw();}}]);}
 function switchPanel(name){
